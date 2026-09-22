@@ -116,7 +116,7 @@
         .pack-btn:active { transform: scale(0.98); }
         .pack-btn:disabled { background: #333e4d; color: #6d7b8b; cursor: not-allowed; box-shadow: none; }
 
-        /* --- OUTILS DEV (TEST TIMER) --- */
+        /* --- OUTILS DEV (TEST DU TIMER) --- */
         .dev-panel {
             margin-top: 35px;
             padding: 15px;
@@ -255,7 +255,7 @@
             justify-content: center;
         }
 
-        /* Halo d'ambiance projeté derrière la carte */
+        /* Halo lumineux de rareté */
         .card-stage-halo {
             position: absolute;
             inset: -15px;
@@ -339,7 +339,7 @@
         .back-pattern svg { width: 50px; height: 50px; fill: #2481cc; opacity: 0.8; }
         .back-pattern span { font-size: 11px; font-weight: 800; letter-spacing: 2px; color: #4e7399; text-transform: uppercase; }
 
-        /* Face avant révélée avec GLOWS DE RARETÉ PUISSANTS */
+        /* Face avant révélée avec GLOWS DE RARETÉ */
         .card-face.front {
             transform: rotateY(180deg);
             background: var(--secondary-bg);
@@ -514,12 +514,11 @@
         </div>
     </div>
 
-    <!-- ÉCRAN D'OUVERTURE DE BOOSTER (CLIC DIRECT SUR LA CARTE) -->
+    <!-- ÉCRAN D'OUVERTURE DE BOOSTER -->
     <div id="opening-screen">
         <div class="reveal-header">Carte <span id="reveal-current">1</span> / 3</div>
 
         <div class="card-stage-container">
-            <!-- Halo lumineux de rareté -->
             <div class="card-stage-halo" id="card-halo"></div>
 
             <div class="card-stage" onclick="handleCardClick()">
@@ -536,9 +535,7 @@
                     </div>
 
                     <!-- FACE AVANT (RÉVÉLÉE AVEC GLOW) -->
-                    <div class="card-face front" id="reveal-card-front">
-                        <!-- Rempli dynamiquement -->
-                    </div>
+                    <div class="card-face front" id="reveal-card-front"></div>
 
                 </div>
             </div>
@@ -565,7 +562,7 @@
             tg.expand();
         }
 
-        // --- 2. BASE DE DONNÉES (Supporte les images 630x880) ---
+        // --- 2. BASE DE DONNÉES (Supporte 630x880) ---
         const CARDS_DB = {
             common: [
                 { id: 'c1', name: 'Épée de novice', emoji: '🗡️', image: '' },
@@ -701,7 +698,7 @@
             return { ...card, rarity };
         }
 
-        // --- 6. OUVERTURE DE BOOSTER (CLIC DIRECT SUR LA CARTE) ---
+        // --- 6. OUVERTURE DE BOOSTER ---
         let currentPack = [];
         let cardStep = 0;
         let isCardFlipped = false;
@@ -734,17 +731,14 @@
             const tapHint = document.getElementById('tap-hint');
             const halo = document.getElementById('card-halo');
 
-            // Réinitialisation du halo et des textes
             halo.className = 'card-stage-halo';
             halo.style.background = 'transparent';
 
             document.getElementById('reveal-current').innerText = cardStep + 1;
             tapHint.innerText = "Touche la carte pour révéler";
 
-            // Réinitialise la carte
             cardWrapper.className = 'card-3d-wrapper';
 
-            // Préparation de la face avant avec le Glow de rareté
             const card = currentPack[cardStep];
             frontFace.className = `card-face front glow-${card.rarity}`;
             frontFace.innerHTML = generateCardHTML(card);
@@ -755,13 +749,12 @@
             }
         }
 
-        // Gestion du clic unique sur la carte
         function handleCardClick() {
             if (!isCardFlipped) {
                 // 1er Clic : Révélation de la carte
                 revealCurrentCard();
             } else if (canProceed) {
-                // 2ème Clic : Passer à la carte suivante
+                // 2ème Clic : Carte suivante ou fermeture
                 advanceToNextCard();
             }
         }
@@ -773,41 +766,36 @@
             const halo = document.getElementById('card-halo');
             const card = currentPack[cardStep];
 
-            // Feedback Haptique selon la rareté
             if (tg?.HapticFeedback) {
                 if (card.rarity === 'legendary') tg.HapticFeedback.notificationOccurred('success');
                 else tg.HapticFeedback.impactOccurred('heavy');
             }
 
-            // Retourner la carte
             cardWrapper.classList.add('flipped');
 
-            // Activer le halo d'ambiance avec la couleur de la rareté
             halo.style.background = `var(--color-${card.rarity})`;
             halo.classList.add('active');
 
-            // Sauvegarder dans l'inventaire
+            // Sauvegarde dans l'inventaire
             state.inventory[card.id] = (state.inventory[card.id] || 0) + 1;
             saveState();
 
-            // Mettre à jour l'indice après la fin du flip (évite les doubles clics accidentels)
             setTimeout(() => {
                 canProceed = true;
-                tapHint.innerText = cardStep === 2 ? "Touche pour voir la collection" : "Touche la carte pour continuer";
+                // Indique "terminer" sur la 3ème carte
+                tapHint.innerText = cardStep === 2 ? "Touche pour terminer" : "Touche la carte pour continuer";
             }, 450);
         }
 
         function advanceToNextCard() {
             canProceed = false;
+            const halo = document.getElementById('card-halo');
 
             if (cardStep < 2) {
                 const cardWrapper = document.getElementById('card-3d');
-                const halo = document.getElementById('card-halo');
-
-                // Éteindre le halo
                 halo.classList.remove('active');
 
-                // Sortie vers la gauche (pas de spoil !)
+                // Sortie vers la gauche sans spoil
                 cardWrapper.classList.add('slide-out-left');
 
                 setTimeout(() => {
@@ -815,9 +803,11 @@
                     loadCardIntoStage(true);
                 }, 280);
             } else {
-                // Fin du booster : redirection vers la collection
+                // Fin du booster : ON RESTE SUR LA BOUTIQUE
+                halo.classList.remove('active');
                 document.getElementById('opening-screen').style.display = 'none';
-                switchTab('collection');
+                renderEnergyUI(); // Rafraîchit l'affichage boutique
+                
                 if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
             }
         }
@@ -835,7 +825,7 @@
             `;
         }
 
-        // --- 8. COLLECTION (UNIQUEMENT LES CARTES POSSÉDÉES) ---
+        // --- 8. COLLECTION (UNIQUEMENT CARTES OBTENUES) ---
         function renderCollection() {
             const grid = document.getElementById('collection-grid');
             grid.innerHTML = '';
@@ -847,7 +837,6 @@
                 ...CARDS_DB.legendary.map(c => ({ ...c, rarity: 'legendary' }))
             ];
 
-            // Filtrer uniquement les cartes possédées
             const ownedCards = allCards.filter(card => (state.inventory[card.id] || 0) > 0);
 
             if (ownedCards.length === 0) {
@@ -870,7 +859,6 @@
                 });
             }
 
-            // Progression globale
             const pct = (ownedCards.length / TOTAL_CARDS) * 100;
             document.getElementById('progress-fill').style.width = pct + '%';
             document.getElementById('progress-text').innerText = `${ownedCards.length} / ${TOTAL_CARDS} cartes découvertes`;
@@ -899,7 +887,7 @@
             document.getElementById('card-modal').classList.remove('active');
         }
 
-        // --- 10. GESTION DES ONGLETS ---
+        // --- 10. NAVIGATION ---
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
