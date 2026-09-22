@@ -8,18 +8,24 @@
     <style>
         /* --- VARIABLES & THÈME TELEGRAM --- */
         :root {
-            --bg-color: var(--tg-theme-bg-color, #131922);
+            --bg-color: var(--tg-theme-bg-color, #111720);
             --text-color: var(--tg-theme-text-color, #ffffff);
-            --hint-color: var(--tg-theme-hint-color, #7e8b9b);
+            --hint-color: var(--tg-theme-hint-color, #788796);
             --button-color: var(--tg-theme-button-color, #2481cc);
             --button-text-color: var(--tg-theme-button-text-color, #ffffff);
-            --secondary-bg: var(--tg-theme-secondary-bg-color, #1c2430);
+            --secondary-bg: var(--tg-theme-secondary-bg-color, #1a232f);
             
             /* Couleurs de rareté officielles */
-            --color-common: #8c9ba5;
-            --color-rare: #0088ff;
+            --color-common: #95a5b5;
+            --color-rare: #0094ff;
             --color-epic: #a335ee;
-            --color-legendary: #ff9900;
+            --color-legendary: #ffaa00;
+
+            /* Glows spécifiques */
+            --glow-common: 0 0 25px rgba(149, 165, 181, 0.6), 0 0 50px rgba(149, 165, 181, 0.2);
+            --glow-rare: 0 0 35px rgba(0, 148, 255, 0.8), 0 0 70px rgba(0, 148, 255, 0.4);
+            --glow-epic: 0 0 40px rgba(163, 53, 238, 0.85), 0 0 80px rgba(163, 53, 238, 0.45);
+            --glow-legendary: 0 0 55px rgba(255, 170, 0, 0.95), 0 0 110px rgba(255, 170, 0, 0.55);
         }
 
         * {
@@ -29,6 +35,7 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
 
         body {
@@ -87,7 +94,7 @@
             padding: 20px;
             text-align: center;
             margin-bottom: 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.25);
             border: 1px solid rgba(255,255,255,0.05);
         }
         .energy-count { font-size: 26px; font-weight: 800; margin-bottom: 6px; letter-spacing: 0.5px; }
@@ -103,13 +110,13 @@
             font-weight: 700;
             cursor: pointer;
             width: 100%;
-            box-shadow: 0 4px 12px rgba(36, 129, 204, 0.35);
-            transition: transform 0.1s, opacity 0.2s;
+            box-shadow: 0 4px 14px rgba(36, 129, 204, 0.4);
+            transition: transform 0.1s;
         }
         .pack-btn:active { transform: scale(0.98); }
-        .pack-btn:disabled { background: #374353; color: #728091; cursor: not-allowed; box-shadow: none; }
+        .pack-btn:disabled { background: #333e4d; color: #6d7b8b; cursor: not-allowed; box-shadow: none; }
 
-        /* --- DEV TOOLS (RESET TIMER / TESTS) --- */
+        /* --- OUTILS DEV (TEST TIMER) --- */
         .dev-panel {
             margin-top: 35px;
             padding: 15px;
@@ -132,7 +139,7 @@
         }
         .dev-btn:active { background: rgba(255,255,255,0.1); }
 
-        /* --- COLLECTION (SCROLLABLE JUSQU'À 100+ CARTES) --- */
+        /* --- MA COLLECTION --- */
         .progress-bar-container {
             background: var(--secondary-bg);
             border-radius: 10px;
@@ -163,6 +170,16 @@
             padding-bottom: 20px;
         }
 
+        .empty-collection {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--hint-color);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .empty-collection span { font-size: 40px; display: block; margin-bottom: 12px; }
+
         .card-frame {
             aspect-ratio: 630 / 880;
             border-radius: 10px;
@@ -173,33 +190,18 @@
             display: flex;
             flex-direction: column;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.35);
             transition: transform 0.15s ease;
         }
         .card-frame:active { transform: scale(0.96); }
 
-        .card-frame.locked {
-            filter: grayscale(1) brightness(0.35);
-            cursor: default;
-            border-color: rgba(255,255,255,0.08);
-        }
-        .card-frame.locked::after {
-            content: "🔒";
-            position: absolute;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-
-        /* Raretés */
+        /* Raretés en collection */
         .rarity-common { border-color: var(--color-common); }
-        .rarity-rare { border-color: var(--color-rare); box-shadow: 0 0 10px rgba(0,136,255,0.3); }
+        .rarity-rare { border-color: var(--color-rare); box-shadow: 0 0 10px rgba(0,148,255,0.3); }
         .rarity-epic { border-color: var(--color-epic); box-shadow: 0 0 12px rgba(163,53,238,0.4); }
-        .rarity-legendary { border-color: var(--color-legendary); box-shadow: 0 0 16px rgba(255,153,0,0.5); }
+        .rarity-legendary { border-color: var(--color-legendary); box-shadow: 0 0 16px rgba(255,170,0,0.5); }
 
-        /* Contenu de carte (Image 630x880 ou fallback élégant) */
+        /* Contenu visuel carte */
         .card-image {
             width: 100%;
             height: 100%;
@@ -220,7 +222,7 @@
         .card-fallback-emoji { font-size: 34px; margin-bottom: 6px; }
         .card-fallback-name { font-size: 10px; font-weight: 700; line-height: 1.2; }
 
-        /* --- ÉCRAN D'OUVERTURE DE PACK (1 PAR 1 SANS SPOIL) --- */
+        /* --- ÉCRAN D'OUVERTURE DE BOOSTER --- */
         #opening-screen {
             position: fixed;
             inset: 0;
@@ -235,21 +237,44 @@
 
         .reveal-header {
             position: absolute;
-            top: 30px;
-            font-size: 15px;
-            font-weight: 700;
+            top: 40px;
+            font-size: 16px;
+            font-weight: 800;
             color: var(--hint-color);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
         }
 
-        /* Conteneur 3D */
-        .card-stage {
-            width: min(270px, 72vw);
-            aspect-ratio: 630 / 880;
-            perspective: 1200px;
-            margin-bottom: 40px;
+        /* Conteneur de scène 3D */
+        .card-stage-container {
             position: relative;
+            width: min(280px, 75vw);
+            aspect-ratio: 630 / 880;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Halo d'ambiance projeté derrière la carte */
+        .card-stage-halo {
+            position: absolute;
+            inset: -15px;
+            border-radius: 30px;
+            filter: blur(35px);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .card-stage-halo.active { opacity: 0.85; }
+
+        .card-stage {
+            width: 100%;
+            height: 100%;
+            perspective: 1200px;
+            position: relative;
+            z-index: 2;
+            cursor: pointer;
         }
 
         .card-3d-wrapper {
@@ -260,7 +285,7 @@
             transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
-        /* Glissements d'apparition/disparition pour éviter le spoil */
+        /* Animations d'entrée / sortie sans spoil */
         .slide-in-right {
             animation: slideInRight 0.35s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
         }
@@ -269,12 +294,12 @@
         }
 
         @keyframes slideInRight {
-            0% { transform: translateX(120%) scale(0.85); opacity: 0; }
+            0% { transform: translateX(130%) scale(0.85); opacity: 0; }
             100% { transform: translateX(0) scale(1); opacity: 1; }
         }
         @keyframes slideOutLeft {
             0% { transform: translateX(0) rotateY(180deg) scale(1); opacity: 1; }
-            100% { transform: translateX(-120%) rotateY(180deg) scale(0.8); opacity: 0; }
+            100% { transform: translateX(-130%) rotateY(180deg) scale(0.8); opacity: 0; }
         }
 
         .card-3d-wrapper.flipped {
@@ -288,17 +313,17 @@
             backface-visibility: hidden;
             -webkit-backface-visibility: hidden;
             overflow: hidden;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
-            border: 3px solid rgba(255,255,255,0.1);
+            border: 3.5px solid rgba(255,255,255,0.12);
         }
 
-        /* Dos de la carte (Texture Mystique TCG) */
+        /* Dos de la carte TCG */
         .card-face.back {
             background: linear-gradient(135deg, #18283b, #0e1722);
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 3px solid #2d4563;
+            border: 3.5px solid #2d4563;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
         }
         .back-pattern {
             width: 82%;
@@ -314,7 +339,7 @@
         .back-pattern svg { width: 50px; height: 50px; fill: #2481cc; opacity: 0.8; }
         .back-pattern span { font-size: 11px; font-weight: 800; letter-spacing: 2px; color: #4e7399; text-transform: uppercase; }
 
-        /* Face avant de la carte révélée */
+        /* Face avant révélée avec GLOWS DE RARETÉ PUISSANTS */
         .card-face.front {
             transform: rotateY(180deg);
             background: var(--secondary-bg);
@@ -322,25 +347,49 @@
             flex-direction: column;
         }
 
+        .card-face.front.glow-common {
+            border-color: var(--color-common);
+            box-shadow: var(--glow-common);
+        }
+        .card-face.front.glow-rare {
+            border-color: var(--color-rare);
+            box-shadow: var(--glow-rare);
+        }
+        .card-face.front.glow-epic {
+            border-color: var(--color-epic);
+            box-shadow: var(--glow-epic);
+        }
+        .card-face.front.glow-legendary {
+            border-color: var(--color-legendary);
+            box-shadow: var(--glow-legendary);
+            animation: legendaryPulse 1.8s infinite alternate;
+        }
+
+        @keyframes legendaryPulse {
+            0% { box-shadow: var(--glow-legendary); }
+            100% { box-shadow: 0 0 75px rgba(255, 170, 0, 1), 0 0 130px rgba(255, 170, 0, 0.7); }
+        }
+
         .tap-hint {
             position: absolute;
-            bottom: -32px;
+            bottom: -45px;
             left: 0;
             width: 100%;
             text-align: center;
-            font-size: 13px;
-            color: var(--hint-color);
-            font-weight: 600;
-            animation: pulse 1.5s infinite;
+            font-size: 14px;
+            color: var(--text-color);
+            font-weight: 700;
+            animation: pulseHint 1.4s infinite ease-in-out;
+            pointer-events: none;
         }
-        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+        @keyframes pulseHint { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
 
-        /* --- MODAL DÉTAILS CARTE (AVEC COMPTEUR DE DOUBLONS) --- */
+        /* --- MODAL DÉTAILS DE LA CARTE --- */
         .modal-overlay {
             position: fixed;
             inset: 0;
             background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(6px);
             z-index: 300;
             display: flex;
             align-items: center;
@@ -356,7 +405,7 @@
             background: var(--secondary-bg);
             border-radius: 20px;
             width: 100%;
-            max-width: 320px;
+            max-width: 310px;
             padding: 24px;
             display: flex;
             flex-direction: column;
@@ -409,7 +458,7 @@
     <div id="tab-shop" class="tab-content active">
         <div class="shop-header">
             <h2>Boutique TCG</h2>
-            <p style="color: var(--hint-color); font-size: 14px; margin-top: 4px;">Ouvre des boosters et complète ton album</p>
+            <p style="color: var(--hint-color); font-size: 14px; margin-top: 4px;">Ouvre des boosters et agrandis ta collection</p>
         </div>
 
         <div class="energy-box">
@@ -421,12 +470,12 @@
             Ouvrir 1 Booster (3 cartes)
         </button>
 
-        <!-- PANNEAU DÉVELOPPEMENT -->
+        <!-- OUTILS DEV (TEST DU TIMER) -->
         <div class="dev-panel">
             <div class="dev-title">🛠️ Outils Dev (Test Rapide)</div>
             <div class="dev-btn-group">
-                <button class="dev-btn" onclick="devResetTimer()">⚡ Packs Max (5/5)</button>
-                <button class="dev-btn" onclick="devAddPack()">➕ +1 Pack</button>
+                <button class="dev-btn" onclick="devResetTimer()">⚡ Booster Max (5/5)</button>
+                <button class="dev-btn" onclick="devAddPack()">➕ +1 Booster</button>
                 <button class="dev-btn" onclick="devClearSave()" style="color: #ff6b6b;">🗑️ Reset Data</button>
             </div>
         </div>
@@ -438,18 +487,17 @@
         
         <div class="progress-bar-container">
             <div class="progress-bar-fill" id="progress-fill"></div>
-            <div class="progress-text" id="progress-text">0 / 0</div>
+            <div class="progress-text" id="progress-text">0 / 0 cartes</div>
         </div>
 
         <div class="collection-grid" id="collection-grid">
-            <!-- Rempli par JavaScript (scrollable à l'infini) -->
+            <!-- Rempli par JavaScript (uniquement les cartes obtenues) -->
         </div>
     </div>
 
-    <!-- NAVIGATION DU BAS AVEC ICÔNE TRÉSOR -->
+    <!-- NAVIGATION DU BAS (ICÔNE TRÉSOR) -->
     <div class="bottom-nav">
         <div class="nav-item active" onclick="switchTab('shop')" id="nav-shop">
-            <!-- Icône Coffre au Trésor SVG -->
             <svg viewBox="0 0 24 24">
                 <path d="M4 6C4 4.89543 4.89543 4 6 4H18C19.1046 4 20 4.89543 20 6V9H4V6Z"/>
                 <path d="M4 11H9V13C9 13.5523 9.44772 14 10 14H14C14.5523 14 15 13.5523 15 13V11H20V18C20 19.1046 19.1046 20 18 20H6C4.89543 20 4 19.1046 4 18V11Z"/>
@@ -458,7 +506,6 @@
             Boutique
         </div>
         <div class="nav-item" onclick="switchTab('collection')" id="nav-collection">
-            <!-- Icône Album / Grimoire SVG -->
             <svg viewBox="0 0 24 24">
                 <path d="M4 4C4 2.89543 4.89543 2 6 2H18C19.1046 2 20 2.89543 20 4V20C20 21.1046 19.1046 22 18 22H6C4.89543 22 4 21.1046 4 20V4Z"/>
                 <path d="M7 6H17M7 10H17M7 14H13" stroke="var(--secondary-bg)" stroke-width="2" stroke-linecap="round"/>
@@ -467,43 +514,42 @@
         </div>
     </div>
 
-    <!-- ÉCRAN D'OUVERTURE DE PACK (1 CARTE PAR 1 CARTE) -->
+    <!-- ÉCRAN D'OUVERTURE DE BOOSTER (CLIC DIRECT SUR LA CARTE) -->
     <div id="opening-screen">
         <div class="reveal-header">Carte <span id="reveal-current">1</span> / 3</div>
 
-        <div class="card-stage" onclick="flipCurrentCard()">
-            <div class="card-3d-wrapper" id="card-3d">
-                
-                <!-- DOS (FACE NON DÉCOUVERTE) -->
-                <div class="card-face back">
-                    <div class="back-pattern">
-                        <svg viewBox="0 0 24 24">
-                            <polygon points="12,2 15,9 22,9 17,14 19,21 12,17 5,21 7,14 2,9 9,9"/>
-                        </svg>
-                        <span>TCG</span>
+        <div class="card-stage-container">
+            <!-- Halo lumineux de rareté -->
+            <div class="card-stage-halo" id="card-halo"></div>
+
+            <div class="card-stage" onclick="handleCardClick()">
+                <div class="card-3d-wrapper" id="card-3d">
+                    
+                    <!-- DOS -->
+                    <div class="card-face back">
+                        <div class="back-pattern">
+                            <svg viewBox="0 0 24 24">
+                                <polygon points="12,2 15,9 22,9 17,14 19,21 12,17 5,21 7,14 2,9 9,9"/>
+                            </svg>
+                            <span>TCG</span>
+                        </div>
                     </div>
-                </div>
 
-                <!-- FACE AVANT (RÉVÉLÉE AU CLIC) -->
-                <div class="card-face front" id="reveal-card-front">
-                    <!-- Rempli dynamiquement -->
-                </div>
+                    <!-- FACE AVANT (RÉVÉLÉE AVEC GLOW) -->
+                    <div class="card-face front" id="reveal-card-front">
+                        <!-- Rempli dynamiquement -->
+                    </div>
 
+                </div>
             </div>
-            <div class="tap-hint" id="tap-hint">Touche la carte pour la révéler</div>
+            <div class="tap-hint" id="tap-hint">Touche la carte pour révéler</div>
         </div>
-
-        <button class="pack-btn" id="next-reveal-btn" style="max-width: 270px; display: none;" onclick="nextCardStep()">
-            Carte suivante
-        </button>
     </div>
 
     <!-- MODAL DÉTAILS DE LA CARTE -->
     <div class="modal-overlay" id="card-modal" onclick="closeModal(event)">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-card-stage" id="modal-card-stage">
-                <!-- Rempli par JS -->
-            </div>
+            <div class="modal-card-stage" id="modal-card-stage"></div>
             <div class="modal-name" id="modal-card-name">Nom</div>
             <div class="modal-rarity" id="modal-card-rarity">Rareté</div>
             <div class="modal-badge-count">Exemplaires possédés : <strong id="modal-card-count" style="color: var(--button-color); margin-left: 4px;">x0</strong></div>
@@ -512,15 +558,14 @@
     </div>
 
     <script>
-        // --- 1. INITIALISATION TELEGRAM WEBAPP ---
+        // --- 1. INITIALISATION TELEGRAM ---
         const tg = window.Telegram?.WebApp;
         if (tg) {
             tg.ready();
             tg.expand();
         }
 
-        // --- 2. BASE DE DONNÉES DES CARTES (Format 630x880) ---
-        // Tu pourras ajouter jusqu'à 100+ cartes et remplacer 'image' par le chemin de ton illustration (ex: "images/dragon.png")
+        // --- 2. BASE DE DONNÉES (Supporte les images 630x880) ---
         const CARDS_DB = {
             common: [
                 { id: 'c1', name: 'Épée de novice', emoji: '🗡️', image: '' },
@@ -548,7 +593,7 @@
 
         const TOTAL_CARDS = Object.values(CARDS_DB).reduce((sum, list) => sum + list.length, 0);
 
-        // --- 3. GESTION DU STATE & CLOUD STORAGE ---
+        // --- 3. SAUVEGARDE VIA CLOUDSTORAGE ---
         const PACK_REGEN_TIME = 30 * 60 * 1000; // 30 minutes
         const MAX_PACKS = 5;
 
@@ -560,7 +605,7 @@
 
         function saveState() {
             const data = JSON.stringify(state);
-            if (tg && tg.CloudStorage) {
+            if (tg?.CloudStorage) {
                 tg.CloudStorage.setItem('tma_gacha_v1', data);
             } else {
                 localStorage.setItem('tma_gacha_v1', data);
@@ -568,7 +613,7 @@
         }
 
         function loadState(callback) {
-            if (tg && tg.CloudStorage) {
+            if (tg?.CloudStorage) {
                 tg.CloudStorage.getItem('tma_gacha_v1', (err, value) => {
                     if (!err && value) {
                         try { state = JSON.parse(value); } catch(e){}
@@ -584,7 +629,7 @@
             }
         }
 
-        // --- 4. GESTION DU TIMER ET ÉNERGIE ---
+        // --- 4. ÉNERGIE & TIMER ---
         function updateEnergy() {
             const now = Date.now();
             if (state.packs < MAX_PACKS) {
@@ -618,7 +663,7 @@
             openBtn.innerText = state.packs > 0 ? "Ouvrir 1 Booster (3 cartes)" : "Recharge en cours...";
         }
 
-        // --- 5. OUTILS DÉVELOPPEUR ---
+        // --- OUTILS DEV ---
         function devResetTimer() {
             state.packs = MAX_PACKS;
             state.lastUpdate = Date.now();
@@ -643,7 +688,7 @@
             }
         }
 
-        // --- 6. TIRAGE DU GACHA (LOOT TABLE) ---
+        // --- 5. TIRAGE ALÉATOIRE ---
         function drawOneCard() {
             const roll = Math.random() * 100;
             let rarity = 'common';
@@ -656,23 +701,23 @@
             return { ...card, rarity };
         }
 
-        // --- 7. SYSTÈME D'OUVERTURE DE BOOSTER SANS SPOIL ---
+        // --- 6. OUVERTURE DE BOOSTER (CLIC DIRECT SUR LA CARTE) ---
         let currentPack = [];
         let cardStep = 0;
         let isCardFlipped = false;
+        let canProceed = false;
 
         function startPackOpening() {
             if (state.packs <= 0) return;
 
             if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
 
-            // Consomme un pack
+            // Consomme le pack
             state.packs--;
             if (state.packs === MAX_PACKS - 1) state.lastUpdate = Date.now();
             saveState();
             renderEnergyUI();
 
-            // Tirer 3 cartes
             currentPack = [drawOneCard(), drawOneCard(), drawOneCard()];
             cardStep = 0;
 
@@ -682,78 +727,102 @@
 
         function loadCardIntoStage(withSlideAnimation = true) {
             isCardFlipped = false;
+            canProceed = false;
+
             const cardWrapper = document.getElementById('card-3d');
             const frontFace = document.getElementById('reveal-card-front');
-            const nextBtn = document.getElementById('next-reveal-btn');
             const tapHint = document.getElementById('tap-hint');
+            const halo = document.getElementById('card-halo');
 
-            // Mise à jour de l'indicateur
+            // Réinitialisation du halo et des textes
+            halo.className = 'card-stage-halo';
+            halo.style.background = 'transparent';
+
             document.getElementById('reveal-current').innerText = cardStep + 1;
-            nextBtn.style.display = 'none';
-            tapHint.style.display = 'block';
+            tapHint.innerText = "Touche la carte pour révéler";
 
-            // Reset des classes 3D
+            // Réinitialise la carte
             cardWrapper.className = 'card-3d-wrapper';
-            
-            // Préparer la face avant avec l'illustration ou le fallback
+
+            // Préparation de la face avant avec le Glow de rareté
             const card = currentPack[cardStep];
-            frontFace.className = `card-face front rarity-${card.rarity}`;
+            frontFace.className = `card-face front glow-${card.rarity}`;
             frontFace.innerHTML = generateCardHTML(card);
 
             if (withSlideAnimation) {
                 cardWrapper.classList.add('slide-in-right');
-                setTimeout(() => cardWrapper.classList.remove('slide-in-right'), 400);
+                setTimeout(() => cardWrapper.classList.remove('slide-in-right'), 350);
             }
         }
 
-        function flipCurrentCard() {
-            if (isCardFlipped) return;
+        // Gestion du clic unique sur la carte
+        function handleCardClick() {
+            if (!isCardFlipped) {
+                // 1er Clic : Révélation de la carte
+                revealCurrentCard();
+            } else if (canProceed) {
+                // 2ème Clic : Passer à la carte suivante
+                advanceToNextCard();
+            }
+        }
+
+        function revealCurrentCard() {
             isCardFlipped = true;
-
             const cardWrapper = document.getElementById('card-3d');
-            const nextBtn = document.getElementById('next-reveal-btn');
             const tapHint = document.getElementById('tap-hint');
+            const halo = document.getElementById('card-halo');
+            const card = currentPack[cardStep];
 
-            // Haptic & son Telegram
+            // Feedback Haptique selon la rareté
             if (tg?.HapticFeedback) {
-                const rarity = currentPack[cardStep].rarity;
-                if (rarity === 'legendary') tg.HapticFeedback.notificationOccurred('success');
+                if (card.rarity === 'legendary') tg.HapticFeedback.notificationOccurred('success');
                 else tg.HapticFeedback.impactOccurred('heavy');
             }
 
+            // Retourner la carte
             cardWrapper.classList.add('flipped');
-            tapHint.style.display = 'none';
 
-            // Ajouter à l'inventaire
-            const card = currentPack[cardStep];
+            // Activer le halo d'ambiance avec la couleur de la rareté
+            halo.style.background = `var(--color-${card.rarity})`;
+            halo.classList.add('active');
+
+            // Sauvegarder dans l'inventaire
             state.inventory[card.id] = (state.inventory[card.id] || 0) + 1;
             saveState();
 
-            // Affiche le bouton "Carte suivante" ou "Terminer"
+            // Mettre à jour l'indice après la fin du flip (évite les doubles clics accidentels)
             setTimeout(() => {
-                nextBtn.innerText = cardStep === 2 ? "Voir ma collection" : "Carte suivante";
-                nextBtn.style.display = 'block';
-            }, 600);
+                canProceed = true;
+                tapHint.innerText = cardStep === 2 ? "Touche pour voir la collection" : "Touche la carte pour continuer";
+            }, 450);
         }
 
-        function nextCardStep() {
+        function advanceToNextCard() {
+            canProceed = false;
+
             if (cardStep < 2) {
                 const cardWrapper = document.getElementById('card-3d');
-                // Animation de sortie vers la gauche (évite tout spoil visuel !)
+                const halo = document.getElementById('card-halo');
+
+                // Éteindre le halo
+                halo.classList.remove('active');
+
+                // Sortie vers la gauche (pas de spoil !)
                 cardWrapper.classList.add('slide-out-left');
-                
+
                 setTimeout(() => {
                     cardStep++;
                     loadCardIntoStage(true);
-                }, 300);
+                }, 280);
             } else {
-                // Fin du booster
+                // Fin du booster : redirection vers la collection
                 document.getElementById('opening-screen').style.display = 'none';
                 switchTab('collection');
+                if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
             }
         }
 
-        // --- 8. TEMPLATE VISUEL DE CARTE (Supporte 630x880) ---
+        // --- 7. GÉNÉRATEUR VISUEL DE CARTE ---
         function generateCardHTML(card) {
             if (card.image && card.image.trim() !== '') {
                 return `<img class="card-image" src="${card.image}" alt="${card.name}" />`;
@@ -766,12 +835,11 @@
             `;
         }
 
-        // --- 9. COLLECTION ---
+        // --- 8. COLLECTION (UNIQUEMENT LES CARTES POSSÉDÉES) ---
         function renderCollection() {
             const grid = document.getElementById('collection-grid');
             grid.innerHTML = '';
 
-            let ownedCount = 0;
             const allCards = [
                 ...CARDS_DB.common.map(c => ({ ...c, rarity: 'common' })),
                 ...CARDS_DB.rare.map(c => ({ ...c, rarity: 'rare' })),
@@ -779,29 +847,36 @@
                 ...CARDS_DB.legendary.map(c => ({ ...c, rarity: 'legendary' }))
             ];
 
-            allCards.forEach(card => {
-                const count = state.inventory[card.id] || 0;
-                const isOwned = count > 0;
-                if (isOwned) ownedCount++;
+            // Filtrer uniquement les cartes possédées
+            const ownedCards = allCards.filter(card => (state.inventory[card.id] || 0) > 0);
 
-                const cardEl = document.createElement('div');
-                cardEl.className = `card-frame ${isOwned ? 'rarity-' + card.rarity : 'locked'}`;
-                cardEl.innerHTML = generateCardHTML(card);
+            if (ownedCards.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-collection">
+                        <span>📦</span>
+                        Tu n'as encore aucune carte.<br>Ouvre ton premier booster dans la boutique !
+                    </div>
+                `;
+            } else {
+                ownedCards.forEach(card => {
+                    const count = state.inventory[card.id];
 
-                if (isOwned) {
+                    const cardEl = document.createElement('div');
+                    cardEl.className = `card-frame rarity-${card.rarity}`;
+                    cardEl.innerHTML = generateCardHTML(card);
                     cardEl.onclick = () => openModal(card, count);
-                }
 
-                grid.appendChild(cardEl);
-            });
+                    grid.appendChild(cardEl);
+                });
+            }
 
-            // Barre de progression
-            const pct = (ownedCount / TOTAL_CARDS) * 100;
+            // Progression globale
+            const pct = (ownedCards.length / TOTAL_CARDS) * 100;
             document.getElementById('progress-fill').style.width = pct + '%';
-            document.getElementById('progress-text').innerText = `${ownedCount} / ${TOTAL_CARDS} cartes`;
+            document.getElementById('progress-text').innerText = `${ownedCards.length} / ${TOTAL_CARDS} cartes découvertes`;
         }
 
-        // --- 10. MODAL VISUALISATION & DOUBLONS ---
+        // --- 9. MODAL DÉTAILS & DOUBLONS ---
         function openModal(card, count) {
             if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
 
@@ -810,7 +885,7 @@
             stage.innerHTML = generateCardHTML(card);
 
             document.getElementById('modal-card-name').innerText = card.name;
-            
+
             const rarityEl = document.getElementById('modal-card-rarity');
             rarityEl.innerText = card.rarity;
             rarityEl.style.color = `var(--color-${card.rarity})`;
@@ -824,7 +899,7 @@
             document.getElementById('card-modal').classList.remove('active');
         }
 
-        // --- 11. NAVIGATION ---
+        // --- 10. GESTION DES ONGLETS ---
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -836,7 +911,7 @@
             if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
         }
 
-        // --- 12. DÉMARRAGE ---
+        // --- 11. DÉMARRAGE ---
         loadState(() => {
             renderEnergyUI();
             renderCollection();
