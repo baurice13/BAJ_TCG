@@ -3,449 +3,845 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Telegram Gacha</title>
+    <title>Telegram Gacha TCG</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        /* --- VARIABLES & THEME TELEGRAM --- */
+        /* --- VARIABLES & THÈME TELEGRAM --- */
         :root {
-            --bg-color: var(--tg-theme-bg-color, #18222d);
+            --bg-color: var(--tg-theme-bg-color, #131922);
             --text-color: var(--tg-theme-text-color, #ffffff);
-            --hint-color: var(--tg-theme-hint-color, #b1c3d5);
-            --button-color: var(--tg-theme-button-color, #2ea6ff);
+            --hint-color: var(--tg-theme-hint-color, #7e8b9b);
+            --button-color: var(--tg-theme-button-color, #2481cc);
             --button-text-color: var(--tg-theme-button-text-color, #ffffff);
-            --secondary-bg: var(--tg-theme-secondary-bg-color, #232e3c);
+            --secondary-bg: var(--tg-theme-secondary-bg-color, #1c2430);
             
-            /* Couleurs de rareté */
-            --color-common: #a0a0a0;
-            --color-rare: #0070dd;
+            /* Couleurs de rareté officielles */
+            --color-common: #8c9ba5;
+            --color-rare: #0088ff;
             --color-epic: #a335ee;
-            --color-legendary: #ff8000;
+            --color-legendary: #ff9900;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; user-select: none; }
-        body { background-color: var(--bg-color); color: var(--text-color); overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
 
         /* --- NAVIGATION --- */
-        .tab-content { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 80px; display: none; }
+        .tab-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            padding-bottom: 90px;
+            display: none;
+        }
         .tab-content.active { display: block; }
         
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 60px; background-color: var(--secondary-bg); display: flex; box-shadow: 0 -2px 10px rgba(0,0,0,0.2); z-index: 100;}
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--hint-color); font-size: 12px; cursor: pointer; transition: 0.2s; }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 64px;
+            background-color: var(--secondary-bg);
+            display: flex;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            z-index: 100;
+        }
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--hint-color);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: color 0.2s;
+            gap: 4px;
+        }
         .nav-item.active { color: var(--button-color); }
-        .nav-item span { font-size: 24px; margin-bottom: 2px; }
+        .nav-item svg { width: 22px; height: 22px; fill: currentColor; }
 
         /* --- BOUTIQUE --- */
-        .shop-header { text-align: center; margin-bottom: 30px; }
-        .energy-box { background: var(--secondary-bg); border-radius: 15px; padding: 15px; text-align: center; margin-bottom: 30px; }
-        .energy-count { font-size: 24px; font-weight: bold; margin-bottom: 5px; }
-        .timer { color: var(--hint-color); font-size: 14px; }
+        .shop-header { text-align: center; margin: 15px 0 25px; }
+        .shop-header h2 { font-size: 24px; font-weight: 800; }
         
-        .pack-container { display: flex; justify-content: center; margin-bottom: 30px; }
-        .pack-btn { background: var(--button-color); color: var(--button-text-color); border: none; border-radius: 12px; padding: 15px 30px; font-size: 18px; font-weight: bold; box-shadow: 0 4px 0 rgba(0,0,0,0.2); cursor: pointer; transition: 0.1s; width: 100%; max-width: 300px;}
-        .pack-btn:active { transform: translateY(4px); box-shadow: none; }
-        .pack-btn:disabled { background: var(--hint-color); cursor: not-allowed; }
+        .energy-box {
+            background: var(--secondary-bg);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .energy-count { font-size: 26px; font-weight: 800; margin-bottom: 6px; letter-spacing: 0.5px; }
+        .timer { color: var(--hint-color); font-size: 13px; font-weight: 500; }
+        
+        .pack-btn {
+            background: var(--button-color);
+            color: var(--button-text-color);
+            border: none;
+            border-radius: 14px;
+            padding: 16px 20px;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            box-shadow: 0 4px 12px rgba(36, 129, 204, 0.35);
+            transition: transform 0.1s, opacity 0.2s;
+        }
+        .pack-btn:active { transform: scale(0.98); }
+        .pack-btn:disabled { background: #374353; color: #728091; cursor: not-allowed; box-shadow: none; }
 
-        /* --- COLLECTION --- */
-        .progress-bar-container { background: var(--secondary-bg); border-radius: 10px; height: 20px; margin-bottom: 20px; position: relative; overflow: hidden; }
-        .progress-bar-fill { background: var(--button-color); height: 100%; width: 0%; transition: 0.3s; }
-        .progress-text { position: absolute; top: 0; left: 0; width: 100%; text-align: center; font-size: 12px; line-height: 20px; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+        /* --- DEV TOOLS (RESET TIMER / TESTS) --- */
+        .dev-panel {
+            margin-top: 35px;
+            padding: 15px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.03);
+            border: 1px dashed rgba(255,255,255,0.15);
+            text-align: center;
+        }
+        .dev-title { font-size: 11px; text-transform: uppercase; color: var(--hint-color); letter-spacing: 1px; margin-bottom: 10px; font-weight: 700; }
+        .dev-btn-group { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+        .dev-btn {
+            background: var(--secondary-bg);
+            color: var(--text-color);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .dev-btn:active { background: rgba(255,255,255,0.1); }
 
-        .collection-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 15px; }
-        .card-mini { aspect-ratio: 2/3; background: var(--secondary-bg); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 30px; position: relative; border: 2px solid transparent; cursor: pointer; transition: transform 0.1s; }
-        .card-mini:active { transform: scale(0.95); }
-        .card-mini.locked { filter: grayscale(100%) opacity(0.3); cursor: default; }
-        .card-mini.locked::after { content: "🔒"; position: absolute; font-size: 20px; }
+        /* --- COLLECTION (SCROLLABLE JUSQU'À 100+ CARTES) --- */
+        .progress-bar-container {
+            background: var(--secondary-bg);
+            border-radius: 10px;
+            height: 22px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .progress-bar-fill {
+            background: linear-gradient(90deg, #2481cc, #54a9eb);
+            height: 100%;
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+        .progress-text {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+        }
 
-        /* Bordures de rareté */
-        .border-common { border-color: var(--color-common); box-shadow: 0 0 10px var(--color-common); }
-        .border-rare { border-color: var(--color-rare); box-shadow: 0 0 10px var(--color-rare); }
-        .border-epic { border-color: var(--color-epic); box-shadow: 0 0 10px var(--color-epic); }
-        .border-legendary { border-color: var(--color-legendary); box-shadow: 0 0 10px var(--color-legendary); }
+        /* Ratio 630 x 880 (TCG standard) */
+        .collection-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            padding-bottom: 20px;
+        }
 
-        /* --- MODAL (Vue détaillée de la carte) --- */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 200; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.3s; }
+        .card-frame {
+            aspect-ratio: 630 / 880;
+            border-radius: 10px;
+            position: relative;
+            background: var(--secondary-bg);
+            border: 2px solid transparent;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: transform 0.15s ease;
+        }
+        .card-frame:active { transform: scale(0.96); }
+
+        .card-frame.locked {
+            filter: grayscale(1) brightness(0.35);
+            cursor: default;
+            border-color: rgba(255,255,255,0.08);
+        }
+        .card-frame.locked::after {
+            content: "🔒";
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        /* Raretés */
+        .rarity-common { border-color: var(--color-common); }
+        .rarity-rare { border-color: var(--color-rare); box-shadow: 0 0 10px rgba(0,136,255,0.3); }
+        .rarity-epic { border-color: var(--color-epic); box-shadow: 0 0 12px rgba(163,53,238,0.4); }
+        .rarity-legendary { border-color: var(--color-legendary); box-shadow: 0 0 16px rgba(255,153,0,0.5); }
+
+        /* Contenu de carte (Image 630x880 ou fallback élégant) */
+        .card-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .card-fallback {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.08) 0%, transparent 80%);
+            padding: 8px;
+            text-align: center;
+        }
+        .card-fallback-emoji { font-size: 34px; margin-bottom: 6px; }
+        .card-fallback-name { font-size: 10px; font-weight: 700; line-height: 1.2; }
+
+        /* --- ÉCRAN D'OUVERTURE DE PACK (1 PAR 1 SANS SPOIL) --- */
+        #opening-screen {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at center, #1b2636 0%, #0d1219 100%);
+            z-index: 200;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .reveal-header {
+            position: absolute;
+            top: 30px;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--hint-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Conteneur 3D */
+        .card-stage {
+            width: min(270px, 72vw);
+            aspect-ratio: 630 / 880;
+            perspective: 1200px;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .card-3d-wrapper {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        /* Glissements d'apparition/disparition pour éviter le spoil */
+        .slide-in-right {
+            animation: slideInRight 0.35s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
+        }
+        .slide-out-left {
+            animation: slideOutLeft 0.3s cubic-bezier(0.8, 0, 0.9, 0.2) forwards;
+        }
+
+        @keyframes slideInRight {
+            0% { transform: translateX(120%) scale(0.85); opacity: 0; }
+            100% { transform: translateX(0) scale(1); opacity: 1; }
+        }
+        @keyframes slideOutLeft {
+            0% { transform: translateX(0) rotateY(180deg) scale(1); opacity: 1; }
+            100% { transform: translateX(-120%) rotateY(180deg) scale(0.8); opacity: 0; }
+        }
+
+        .card-3d-wrapper.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            inset: 0;
+            border-radius: 16px;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            border: 3px solid rgba(255,255,255,0.1);
+        }
+
+        /* Dos de la carte (Texture Mystique TCG) */
+        .card-face.back {
+            background: linear-gradient(135deg, #18283b, #0e1722);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid #2d4563;
+        }
+        .back-pattern {
+            width: 82%;
+            height: 88%;
+            border: 2px dashed rgba(255,255,255,0.15);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .back-pattern svg { width: 50px; height: 50px; fill: #2481cc; opacity: 0.8; }
+        .back-pattern span { font-size: 11px; font-weight: 800; letter-spacing: 2px; color: #4e7399; text-transform: uppercase; }
+
+        /* Face avant de la carte révélée */
+        .card-face.front {
+            transform: rotateY(180deg);
+            background: var(--secondary-bg);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tap-hint {
+            position: absolute;
+            bottom: -32px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 13px;
+            color: var(--hint-color);
+            font-weight: 600;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+        /* --- MODAL DÉTAILS CARTE (AVEC COMPTEUR DE DOUBLONS) --- */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(5px);
+            z-index: 300;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
-        .modal-content { background: var(--bg-color); padding: 20px; border-radius: 20px; text-align: center; width: 80%; max-width: 300px; display: flex; flex-direction: column; align-items: center; }
-        
-        .modal-card-visual { width: 150px; height: 225px; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 80px; margin-bottom: 20px; background: var(--secondary-bg); border: 4px solid; }
-        .modal-card-name { font-size: 22px; font-weight: bold; margin-bottom: 5px; }
-        .modal-card-rarity { font-size: 14px; text-transform: uppercase; font-weight: bold; margin-bottom: 15px; }
-        .modal-card-count { background: var(--secondary-bg); padding: 8px 15px; border-radius: 10px; margin-bottom: 20px; }
-        
-        .close-btn { background: var(--button-color); color: var(--button-text-color); border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; width: 100%; cursor: pointer; }
 
-        /* --- SYSTEME D'OUVERTURE DE PACK (1 par 1) --- */
-        #opening-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 150; display: none; flex-direction: column; align-items: center; justify-content: center; }
-        .reveal-counter { position: absolute; top: 40px; font-size: 18px; color: var(--hint-color); }
-        
-        .scene { width: 200px; height: 300px; perspective: 1000px; margin-bottom: 40px; }
-        .card-3d { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; cursor: pointer; }
-        .card-3d.flipped { transform: rotateY(180deg); }
-        
-        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 100px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 4px solid; }
-        .card-face.front { background: linear-gradient(135deg, var(--button-color), #0050a0); border-color: var(--hint-color); }
-        .card-face.front::after { content: "?"; color: rgba(255,255,255,0.5); }
-        .card-face.back { transform: rotateY(180deg); background: var(--secondary-bg); flex-direction: column; }
-        
-        #next-reveal-btn { display: none; opacity: 0; transition: opacity 0.3s; }
+        .modal-content {
+            background: var(--secondary-bg);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 320px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.08);
+            transform: translateY(20px);
+            transition: transform 0.25s ease;
+        }
+        .modal-overlay.active .modal-content { transform: translateY(0); }
+
+        .modal-card-stage {
+            width: 180px;
+            aspect-ratio: 630 / 880;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            border: 3px solid;
+            background: var(--bg-color);
+        }
+
+        .modal-name { font-size: 20px; font-weight: 800; margin-bottom: 4px; text-align: center; }
+        .modal-rarity { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
+        .modal-badge-count {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 22px;
+        }
+        .modal-close-btn {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-color);
+            border: none;
+            border-radius: 12px;
+            padding: 12px;
+            width: 100%;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .modal-close-btn:active { background: rgba(255,255,255,0.15); }
     </style>
 </head>
 <body>
 
-    <!-- Onglet Boutique -->
+    <!-- ONGLET 1 : BOUTIQUE -->
     <div id="tab-shop" class="tab-content active">
         <div class="shop-header">
-            <h2>Boutique Gacha</h2>
-            <p style="color: var(--hint-color); margin-top: 5px;">Ouvre des packs pour agrandir ta collection</p>
+            <h2>Boutique TCG</h2>
+            <p style="color: var(--hint-color); font-size: 14px; margin-top: 4px;">Ouvre des boosters et complète ton album</p>
         </div>
 
         <div class="energy-box">
-            <div class="energy-count">Packs : <span id="pack-count">0</span>/5</div>
-            <div class="timer" id="timer-display">Chargement...</div>
+            <div class="energy-count">Boosters : <span id="pack-count">0</span> / 5</div>
+            <div class="timer" id="timer-display">Calcul...</div>
         </div>
 
-        <div class="pack-container">
-            <button class="pack-btn" id="open-pack-btn" onclick="startPackOpening()">Ouvrir 1 Pack (3 cartes)</button>
+        <button class="pack-btn" id="open-pack-btn" onclick="startPackOpening()">
+            Ouvrir 1 Booster (3 cartes)
+        </button>
+
+        <!-- PANNEAU DÉVELOPPEMENT -->
+        <div class="dev-panel">
+            <div class="dev-title">🛠️ Outils Dev (Test Rapide)</div>
+            <div class="dev-btn-group">
+                <button class="dev-btn" onclick="devResetTimer()">⚡ Packs Max (5/5)</button>
+                <button class="dev-btn" onclick="devAddPack()">➕ +1 Pack</button>
+                <button class="dev-btn" onclick="devClearSave()" style="color: #ff6b6b;">🗑️ Reset Data</button>
+            </div>
         </div>
     </div>
 
-    <!-- Onglet Collection -->
+    <!-- ONGLET 2 : MA COLLECTION -->
     <div id="tab-collection" class="tab-content">
-        <h2>Ma Collection</h2>
-        <br>
+        <h2 style="font-size: 22px; font-weight: 800; margin-bottom: 12px;">Ma Collection</h2>
+        
         <div class="progress-bar-container">
             <div class="progress-bar-fill" id="progress-fill"></div>
             <div class="progress-text" id="progress-text">0 / 0</div>
         </div>
+
         <div class="collection-grid" id="collection-grid">
-            <!-- Rempli par JS -->
+            <!-- Rempli par JavaScript (scrollable à l'infini) -->
         </div>
     </div>
 
-    <!-- Barre de navigation -->
+    <!-- NAVIGATION DU BAS AVEC ICÔNE TRÉSOR -->
     <div class="bottom-nav">
         <div class="nav-item active" onclick="switchTab('shop')" id="nav-shop">
-            <span>🎁</span>
+            <!-- Icône Coffre au Trésor SVG -->
+            <svg viewBox="0 0 24 24">
+                <path d="M4 6C4 4.89543 4.89543 4 6 4H18C19.1046 4 20 4.89543 20 6V9H4V6Z"/>
+                <path d="M4 11H9V13C9 13.5523 9.44772 14 10 14H14C14.5523 14 15 13.5523 15 13V11H20V18C20 19.1046 19.1046 20 18 20H6C4.89543 20 4 19.1046 4 18V11Z"/>
+                <rect x="11" y="11" width="2" height="2" rx="0.5" fill="var(--secondary-bg)"/>
+            </svg>
             Boutique
         </div>
         <div class="nav-item" onclick="switchTab('collection')" id="nav-collection">
-            <span>📚</span>
+            <!-- Icône Album / Grimoire SVG -->
+            <svg viewBox="0 0 24 24">
+                <path d="M4 4C4 2.89543 4.89543 2 6 2H18C19.1046 2 20 2.89543 20 4V20C20 21.1046 19.1046 22 18 22H6C4.89543 22 4 21.1046 4 20V4Z"/>
+                <path d="M7 6H17M7 10H17M7 14H13" stroke="var(--secondary-bg)" stroke-width="2" stroke-linecap="round"/>
+            </svg>
             Collection
         </div>
     </div>
 
-    <!-- Écran d'ouverture de pack -->
+    <!-- ÉCRAN D'OUVERTURE DE PACK (1 CARTE PAR 1 CARTE) -->
     <div id="opening-screen">
-        <div class="reveal-counter">Carte <span id="reveal-current">1</span> / 3</div>
-        
-        <div class="scene" onclick="flipCurrentCard()">
-            <div class="card-3d" id="reveal-card-3d">
-                <div class="card-face front"></div>
-                <div class="card-face back" id="reveal-card-back">
-                    <span id="reveal-emoji"></span>
+        <div class="reveal-header">Carte <span id="reveal-current">1</span> / 3</div>
+
+        <div class="card-stage" onclick="flipCurrentCard()">
+            <div class="card-3d-wrapper" id="card-3d">
+                
+                <!-- DOS (FACE NON DÉCOUVERTE) -->
+                <div class="card-face back">
+                    <div class="back-pattern">
+                        <svg viewBox="0 0 24 24">
+                            <polygon points="12,2 15,9 22,9 17,14 19,21 12,17 5,21 7,14 2,9 9,9"/>
+                        </svg>
+                        <span>TCG</span>
+                    </div>
                 </div>
+
+                <!-- FACE AVANT (RÉVÉLÉE AU CLIC) -->
+                <div class="card-face front" id="reveal-card-front">
+                    <!-- Rempli dynamiquement -->
+                </div>
+
             </div>
+            <div class="tap-hint" id="tap-hint">Touche la carte pour la révéler</div>
         </div>
 
-        <button class="pack-btn" id="next-reveal-btn" onclick="nextReveal()">Carte suivante</button>
+        <button class="pack-btn" id="next-reveal-btn" style="max-width: 270px; display: none;" onclick="nextCardStep()">
+            Carte suivante
+        </button>
     </div>
 
-    <!-- Modal Détail Carte -->
+    <!-- MODAL DÉTAILS DE LA CARTE -->
     <div class="modal-overlay" id="card-modal" onclick="closeModal(event)">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-card-visual" id="modal-visual"></div>
-            <div class="modal-card-name" id="modal-name">Nom</div>
-            <div class="modal-card-rarity" id="modal-rarity">Rareté</div>
-            <div class="modal-card-count">Possédée : <strong id="modal-count">x0</strong></div>
-            <button class="close-btn" onclick="closeModal()">Fermer</button>
+            <div class="modal-card-stage" id="modal-card-stage">
+                <!-- Rempli par JS -->
+            </div>
+            <div class="modal-name" id="modal-card-name">Nom</div>
+            <div class="modal-rarity" id="modal-card-rarity">Rareté</div>
+            <div class="modal-badge-count">Exemplaires possédés : <strong id="modal-card-count" style="color: var(--button-color); margin-left: 4px;">x0</strong></div>
+            <button class="modal-close-btn" onclick="closeModal()">Fermer</button>
         </div>
     </div>
 
     <script>
-        // Init Telegram WebApp
-        const tg = window.Telegram.WebApp;
-        tg.expand();
+        // --- 1. INITIALISATION TELEGRAM WEBAPP ---
+        const tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.ready();
+            tg.expand();
+        }
 
-        // --- LOOT TABLES ---
+        // --- 2. BASE DE DONNÉES DES CARTES (Format 630x880) ---
+        // Tu pourras ajouter jusqu'à 100+ cartes et remplacer 'image' par le chemin de ton illustration (ex: "images/dragon.png")
         const CARDS_DB = {
             common: [
-                { id: 'c1', name: 'Épée en bois', emoji: '🗡️' },
-                { id: 'c2', name: 'Bouclier usé', emoji: '🛡️' },
-                { id: 'c3', name: 'Pomme rouge', emoji: '🍎' },
-                { id: 'c4', name: 'Bottes en cuir', emoji: '👢' }
+                { id: 'c1', name: 'Épée de novice', emoji: '🗡️', image: '' },
+                { id: 'c2', name: 'Bouclier en bois', emoji: '🛡️', image: '' },
+                { id: 'c3', name: 'Pomme enchantée', emoji: '🍎', image: '' },
+                { id: 'c4', name: 'Bottes de cuir', emoji: '👢', image: '' },
+                { id: 'c5', name: 'Parchemin vierge', emoji: '📜', image: '' }
             ],
             rare: [
-                { id: 'r1', name: 'Anneau de mana', emoji: '💍' },
-                { id: 'r2', name: 'Grimoire ancien', emoji: '📖' },
-                { id: 'r3', name: 'Fiole de soin', emoji: '🧪' }
+                { id: 'r1', name: 'Bague de Mana', emoji: '💍', image: '' },
+                { id: 'r2', name: 'Grimoire secret', emoji: '📖', image: '' },
+                { id: 'r3', name: 'Élixir astral', emoji: '🧪', image: '' },
+                { id: 'r4', name: 'Arc elfique', emoji: '🏹', image: '' }
             ],
             epic: [
-                { id: 'e1', name: 'Couronne de roi', emoji: '👑' },
-                { id: 'e2', name: 'Épée maudite', emoji: '🗡️✨' }
+                { id: 'e1', name: 'Couronne royale', emoji: '👑', image: '' },
+                { id: 'e2', name: 'Lame des ombres', emoji: '🗡️✨', image: '' },
+                { id: 'e3', name: 'Guerrier Golem', emoji: '🗿', image: '' }
             ],
             legendary: [
-                { id: 'l1', name: 'Dragon de feu', emoji: '🐉' },
-                { id: 'l2', name: 'Cristal Divin', emoji: '💎' }
+                { id: 'l1', name: 'Dragon Primordial', emoji: '🐉', image: '' },
+                { id: 'l2', name: 'Cristal Cosmique', emoji: '💎', image: '' }
             ]
         };
 
-        const TOTAL_CARDS = Object.values(CARDS_DB).reduce((acc, arr) => acc + arr.length, 0);
+        const TOTAL_CARDS = Object.values(CARDS_DB).reduce((sum, list) => sum + list.length, 0);
 
-        // --- ETAT DU JEU ---
-        let state = {
-            packs: 5,
-            lastUpdate: Date.now(),
-            inventory: {} // { 'c1': 2, 'r1': 1 }
-        };
-
-        // --- CLOUD STORAGE ABSTRACTION ---
-        function saveState() {
-            const dataStr = JSON.stringify(state);
-            if (tg.CloudStorage) {
-                tg.CloudStorage.setItem('gacha_state', dataStr);
-            } else {
-                localStorage.setItem('gacha_state', dataStr);
-            }
-        }
-
-        function loadState() {
-            if (tg.CloudStorage) {
-                tg.CloudStorage.getItem('gacha_state', (err, value) => {
-                    if (!err && value) {
-                        state = JSON.parse(value);
-                    }
-                    initGame();
-                });
-            } else {
-                const local = localStorage.getItem('gacha_state');
-                if (local) state = JSON.parse(local);
-                initGame();
-            }
-        }
-
-        // --- LOGIQUE ENERGIE ---
-        const PACK_REGEN_TIME = 30 * 60 * 1000; // 30 minutes en millisecondes
+        // --- 3. GESTION DU STATE & CLOUD STORAGE ---
+        const PACK_REGEN_TIME = 30 * 60 * 1000; // 30 minutes
         const MAX_PACKS = 5;
 
+        let state = {
+            packs: MAX_PACKS,
+            lastUpdate: Date.now(),
+            inventory: {} // { cardId: count }
+        };
+
+        function saveState() {
+            const data = JSON.stringify(state);
+            if (tg && tg.CloudStorage) {
+                tg.CloudStorage.setItem('tma_gacha_v1', data);
+            } else {
+                localStorage.setItem('tma_gacha_v1', data);
+            }
+        }
+
+        function loadState(callback) {
+            if (tg && tg.CloudStorage) {
+                tg.CloudStorage.getItem('tma_gacha_v1', (err, value) => {
+                    if (!err && value) {
+                        try { state = JSON.parse(value); } catch(e){}
+                    }
+                    callback();
+                });
+            } else {
+                const local = localStorage.getItem('tma_gacha_v1');
+                if (local) {
+                    try { state = JSON.parse(local); } catch(e){}
+                }
+                callback();
+            }
+        }
+
+        // --- 4. GESTION DU TIMER ET ÉNERGIE ---
         function updateEnergy() {
+            const now = Date.now();
             if (state.packs < MAX_PACKS) {
-                const now = Date.now();
-                const diff = now - state.lastUpdate;
-                const packsToGain = Math.floor(diff / PACK_REGEN_TIME);
-                
-                if (packsToGain > 0) {
-                    state.packs = Math.min(MAX_PACKS, state.packs + packsToGain);
-                    state.lastUpdate += packsToGain * PACK_REGEN_TIME;
+                const elapsed = now - state.lastUpdate;
+                const earned = Math.floor(elapsed / PACK_REGEN_TIME);
+                if (earned > 0) {
+                    state.packs = Math.min(MAX_PACKS, state.packs + earned);
+                    state.lastUpdate += earned * PACK_REGEN_TIME;
                     saveState();
                 }
             } else {
-                state.lastUpdate = Date.now();
+                state.lastUpdate = now;
             }
             renderEnergyUI();
         }
 
         function renderEnergyUI() {
             document.getElementById('pack-count').innerText = state.packs;
-            const btn = document.getElementById('open-pack-btn');
-            
-            if (state.packs > 0) {
-                btn.disabled = false;
-                btn.innerText = "Ouvrir 1 Pack (3 cartes)";
-            } else {
-                btn.disabled = true;
-                btn.innerText = "Plus de packs";
-            }
+            const openBtn = document.getElementById('open-pack-btn');
 
             if (state.packs >= MAX_PACKS) {
-                document.getElementById('timer-display').innerText = "Maximum atteint";
+                document.getElementById('timer-display').innerText = "Booster max atteint (5/5)";
             } else {
-                const now = Date.now();
-                const nextPackIn = PACK_REGEN_TIME - (now - state.lastUpdate);
-                const minutes = Math.floor(nextPackIn / 60000);
-                const seconds = Math.floor((nextPackIn % 60000) / 1000);
-                document.getElementById('timer-display').innerText = `Prochain pack dans ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                const remaining = PACK_REGEN_TIME - (Date.now() - state.lastUpdate);
+                const m = Math.floor(remaining / 60000);
+                const s = Math.floor((remaining % 60000) / 1000);
+                document.getElementById('timer-display').innerText = `Prochain booster dans ${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            }
+
+            openBtn.disabled = state.packs <= 0;
+            openBtn.innerText = state.packs > 0 ? "Ouvrir 1 Booster (3 cartes)" : "Recharge en cours...";
+        }
+
+        // --- 5. OUTILS DÉVELOPPEUR ---
+        function devResetTimer() {
+            state.packs = MAX_PACKS;
+            state.lastUpdate = Date.now();
+            saveState();
+            renderEnergyUI();
+            if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+        }
+
+        function devAddPack() {
+            state.packs = Math.min(MAX_PACKS, state.packs + 1);
+            saveState();
+            renderEnergyUI();
+            if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+        }
+
+        function devClearSave() {
+            if (confirm("Réinitialiser l'inventaire et les boosters ?")) {
+                state = { packs: MAX_PACKS, lastUpdate: Date.now(), inventory: {} };
+                saveState();
+                renderEnergyUI();
+                renderCollection();
             }
         }
 
-        // --- LOGIQUE GACHA ---
-        function rollCard() {
-            const rand = Math.random() * 100;
+        // --- 6. TIRAGE DU GACHA (LOOT TABLE) ---
+        function drawOneCard() {
+            const roll = Math.random() * 100;
             let rarity = 'common';
-            if (rand > 70 && rand <= 90) rarity = 'rare'; // 20%
-            else if (rand > 90 && rand <= 99) rarity = 'epic'; // 9%
-            else if (rand > 99) rarity = 'legendary'; // 1%
+            if (roll > 70 && roll <= 90) rarity = 'rare';       // 20%
+            else if (roll > 90 && roll <= 99) rarity = 'epic';   // 9%
+            else if (roll > 99) rarity = 'legendary';            // 1%
 
             const pool = CARDS_DB[rarity];
             const card = pool[Math.floor(Math.random() * pool.length)];
             return { ...card, rarity };
         }
 
-        // --- ANIMATION REVEAL 1 PAR 1 ---
-        let currentDraw = [];
-        let revealIndex = 0;
-        let isFlipping = false;
+        // --- 7. SYSTÈME D'OUVERTURE DE BOOSTER SANS SPOIL ---
+        let currentPack = [];
+        let cardStep = 0;
+        let isCardFlipped = false;
 
         function startPackOpening() {
             if (state.packs <= 0) return;
-            
-            // Haptic feedback
-            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
 
-            // Consommer énergie et tirer
+            if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+
+            // Consomme un pack
             state.packs--;
-            state.lastUpdate = state.packs === MAX_PACKS - 1 ? Date.now() : state.lastUpdate;
+            if (state.packs === MAX_PACKS - 1) state.lastUpdate = Date.now();
             saveState();
-            
-            currentDraw = [rollCard(), rollCard(), rollCard()];
-            revealIndex = 0;
-            
-            // UI
+            renderEnergyUI();
+
+            // Tirer 3 cartes
+            currentPack = [drawOneCard(), drawOneCard(), drawOneCard()];
+            cardStep = 0;
+
             document.getElementById('opening-screen').style.display = 'flex';
-            setupRevealCard();
+            loadCardIntoStage(false);
         }
 
-        function setupRevealCard() {
-            isFlipping = false;
-            const card3D = document.getElementById('reveal-card-3d');
-            const cardBack = document.getElementById('reveal-card-back');
+        function loadCardIntoStage(withSlideAnimation = true) {
+            isCardFlipped = false;
+            const cardWrapper = document.getElementById('card-3d');
+            const frontFace = document.getElementById('reveal-card-front');
             const nextBtn = document.getElementById('next-reveal-btn');
-            
-            // Reset state
-            card3D.classList.remove('flipped');
+            const tapHint = document.getElementById('tap-hint');
+
+            // Mise à jour de l'indicateur
+            document.getElementById('reveal-current').innerText = cardStep + 1;
             nextBtn.style.display = 'none';
-            nextBtn.style.opacity = '0';
-            document.getElementById('reveal-current').innerText = revealIndex + 1;
+            tapHint.style.display = 'block';
 
-            // Préparer la face arrière
-            const card = currentDraw[revealIndex];
-            document.getElementById('reveal-emoji').innerText = card.emoji;
-            cardBack.className = `card-face back border-${card.rarity}`;
+            // Reset des classes 3D
+            cardWrapper.className = 'card-3d-wrapper';
             
-            // Couleur spécifique selon rareté
-            cardBack.style.borderColor = `var(--color-${card.rarity})`;
-            cardBack.style.boxShadow = `inset 0 0 20px var(--color-${card.rarity})`;
-        }
+            // Préparer la face avant avec l'illustration ou le fallback
+            const card = currentPack[cardStep];
+            frontFace.className = `card-face front rarity-${card.rarity}`;
+            frontFace.innerHTML = generateCardHTML(card);
 
-        function flipCurrentCard() {
-            if (isFlipping) return;
-            isFlipping = true;
-            
-            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('rigid');
-            
-            const card3D = document.getElementById('reveal-card-3d');
-            card3D.classList.add('flipped');
-
-            // Sauvegarder dans l'inventaire
-            const card = currentDraw[revealIndex];
-            state.inventory[card.id] = (state.inventory[card.id] || 0) + 1;
-            saveState();
-
-            // Afficher le bouton suivant
-            setTimeout(() => {
-                const nextBtn = document.getElementById('next-reveal-btn');
-                nextBtn.innerText = revealIndex === 2 ? "Terminer" : "Carte suivante";
-                nextBtn.style.display = 'block';
-                setTimeout(() => nextBtn.style.opacity = '1', 50);
-            }, 600);
-        }
-
-        function nextReveal() {
-            if (revealIndex < 2) {
-                revealIndex++;
-                setupRevealCard();
-            } else {
-                // Fin de l'ouverture
-                document.getElementById('opening-screen').style.display = 'none';
-                renderCollection();
-                if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+            if (withSlideAnimation) {
+                cardWrapper.classList.add('slide-in-right');
+                setTimeout(() => cardWrapper.classList.remove('slide-in-right'), 400);
             }
         }
 
-        // --- COLLECTION & UI ---
+        function flipCurrentCard() {
+            if (isCardFlipped) return;
+            isCardFlipped = true;
+
+            const cardWrapper = document.getElementById('card-3d');
+            const nextBtn = document.getElementById('next-reveal-btn');
+            const tapHint = document.getElementById('tap-hint');
+
+            // Haptic & son Telegram
+            if (tg?.HapticFeedback) {
+                const rarity = currentPack[cardStep].rarity;
+                if (rarity === 'legendary') tg.HapticFeedback.notificationOccurred('success');
+                else tg.HapticFeedback.impactOccurred('heavy');
+            }
+
+            cardWrapper.classList.add('flipped');
+            tapHint.style.display = 'none';
+
+            // Ajouter à l'inventaire
+            const card = currentPack[cardStep];
+            state.inventory[card.id] = (state.inventory[card.id] || 0) + 1;
+            saveState();
+
+            // Affiche le bouton "Carte suivante" ou "Terminer"
+            setTimeout(() => {
+                nextBtn.innerText = cardStep === 2 ? "Voir ma collection" : "Carte suivante";
+                nextBtn.style.display = 'block';
+            }, 600);
+        }
+
+        function nextCardStep() {
+            if (cardStep < 2) {
+                const cardWrapper = document.getElementById('card-3d');
+                // Animation de sortie vers la gauche (évite tout spoil visuel !)
+                cardWrapper.classList.add('slide-out-left');
+                
+                setTimeout(() => {
+                    cardStep++;
+                    loadCardIntoStage(true);
+                }, 300);
+            } else {
+                // Fin du booster
+                document.getElementById('opening-screen').style.display = 'none';
+                switchTab('collection');
+            }
+        }
+
+        // --- 8. TEMPLATE VISUEL DE CARTE (Supporte 630x880) ---
+        function generateCardHTML(card) {
+            if (card.image && card.image.trim() !== '') {
+                return `<img class="card-image" src="${card.image}" alt="${card.name}" />`;
+            }
+            return `
+                <div class="card-fallback">
+                    <div class="card-fallback-emoji">${card.emoji}</div>
+                    <div class="card-fallback-name">${card.name}</div>
+                </div>
+            `;
+        }
+
+        // --- 9. COLLECTION ---
         function renderCollection() {
             const grid = document.getElementById('collection-grid');
             grid.innerHTML = '';
-            
-            let collectedCount = 0;
 
+            let ownedCount = 0;
             const allCards = [
-                ...CARDS_DB.common.map(c => ({...c, rarity: 'common'})),
-                ...CARDS_DB.rare.map(c => ({...c, rarity: 'rare'})),
-                ...CARDS_DB.epic.map(c => ({...c, rarity: 'epic'})),
-                ...CARDS_DB.legendary.map(c => ({...c, rarity: 'legendary'}))
+                ...CARDS_DB.common.map(c => ({ ...c, rarity: 'common' })),
+                ...CARDS_DB.rare.map(c => ({ ...c, rarity: 'rare' })),
+                ...CARDS_DB.epic.map(c => ({ ...c, rarity: 'epic' })),
+                ...CARDS_DB.legendary.map(c => ({ ...c, rarity: 'legendary' }))
             ];
 
             allCards.forEach(card => {
                 const count = state.inventory[card.id] || 0;
-                if (count > 0) collectedCount++;
+                const isOwned = count > 0;
+                if (isOwned) ownedCount++;
 
-                const el = document.createElement('div');
-                
-                if (count > 0) {
-                    el.className = `card-mini border-${card.rarity}`;
-                    el.innerHTML = card.emoji;
-                    // Ouvre la modal au clic
-                    el.onclick = () => openModal(card, count);
-                } else {
-                    el.className = `card-mini locked`;
+                const cardEl = document.createElement('div');
+                cardEl.className = `card-frame ${isOwned ? 'rarity-' + card.rarity : 'locked'}`;
+                cardEl.innerHTML = generateCardHTML(card);
+
+                if (isOwned) {
+                    cardEl.onclick = () => openModal(card, count);
                 }
-                
-                grid.appendChild(el);
+
+                grid.appendChild(cardEl);
             });
 
-            // Mise à jour de la barre
-            const percentage = (collectedCount / TOTAL_CARDS) * 100;
-            document.getElementById('progress-fill').style.width = percentage + '%';
-            document.getElementById('progress-text').innerText = `${collectedCount} / ${TOTAL_CARDS}`;
+            // Barre de progression
+            const pct = (ownedCount / TOTAL_CARDS) * 100;
+            document.getElementById('progress-fill').style.width = pct + '%';
+            document.getElementById('progress-text').innerText = `${ownedCount} / ${TOTAL_CARDS} cartes`;
         }
 
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            
-            document.getElementById(`tab-${tabId}`).classList.add('active');
-            document.getElementById(`nav-${tabId}`).classList.add('active');
-            
-            if(tabId === 'collection') renderCollection();
-            if (tg.HapticFeedback) tg.HapticFeedback.selectionChanged();
-        }
-
-        // --- MODAL ---
+        // --- 10. MODAL VISUALISATION & DOUBLONS ---
         function openModal(card, count) {
-            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+            if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+
+            const stage = document.getElementById('modal-card-stage');
+            stage.className = `modal-card-stage rarity-${card.rarity}`;
+            stage.innerHTML = generateCardHTML(card);
+
+            document.getElementById('modal-card-name').innerText = card.name;
             
-            const modal = document.getElementById('card-modal');
-            const visual = document.getElementById('modal-visual');
-            
-            visual.innerText = card.emoji;
-            visual.className = `modal-card-visual border-${card.rarity}`;
-            visual.style.borderColor = `var(--color-${card.rarity})`;
-            visual.style.boxShadow = `0 0 30px var(--color-${card.rarity})`;
-            
-            document.getElementById('modal-name').innerText = card.name;
-            document.getElementById('modal-rarity').innerText = card.rarity;
-            document.getElementById('modal-rarity').style.color = `var(--color-${card.rarity})`;
-            document.getElementById('modal-count').innerText = `x${count}`;
-            
-            modal.classList.add('active');
+            const rarityEl = document.getElementById('modal-card-rarity');
+            rarityEl.innerText = card.rarity;
+            rarityEl.style.color = `var(--color-${card.rarity})`;
+
+            document.getElementById('modal-card-count').innerText = `x${count}`;
+            document.getElementById('card-modal').classList.add('active');
         }
 
-        function closeModal(event) {
-            // Empêche la fermeture si on clique sur le contenu de la modal
-            if (event && event.target !== document.getElementById('card-modal')) return;
+        function closeModal(e) {
+            if (e && e.target !== document.getElementById('card-modal')) return;
             document.getElementById('card-modal').classList.remove('active');
         }
 
-        // --- INITIALISATION ---
-        function initGame() {
-            renderCollection();
-            setInterval(updateEnergy, 1000); // Check l'énergie toutes les secondes
-            updateEnergy(); // Premier check immédiat
+        // --- 11. NAVIGATION ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+            document.getElementById(`nav-${tabId}`).classList.add('active');
+
+            if (tabId === 'collection') renderCollection();
+            if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
         }
 
-        // Lancement (charge depuis Cloud ou LocalStorage)
-        loadState();
-
+        // --- 12. DÉMARRAGE ---
+        loadState(() => {
+            renderEnergyUI();
+            renderCollection();
+            setInterval(updateEnergy, 1000);
+        });
     </script>
 </body>
 </html>
