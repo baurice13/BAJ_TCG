@@ -25,8 +25,12 @@
             /* Halos lumineux projetés derrière la carte */
             --halo-common: rgba(149, 165, 181, 0.45);
             --halo-rare: rgba(0, 148, 255, 0.7);
-            --halo-epic: rgba(163, 53, 238, 0.8);
+            --halo-epic: rgba(163, 53, 238, 0.85);
             --halo-legendary: rgba(255, 170, 0, 0.95);
+
+            /* Positions interactives pour le reflet Foil */
+            --foil-x: 50%;
+            --foil-y: 50%;
         }
 
         * {
@@ -173,6 +177,13 @@
         .rarity-epic { filter: drop-shadow(0 0 11px var(--halo-epic)); }
         .rarity-legendary { filter: drop-shadow(0 0 14px var(--halo-legendary)); }
 
+        .card-wrapper-rel {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+        }
+
         .card-image {
             width: 100%;
             height: 100%;
@@ -192,6 +203,43 @@
         }
         .card-fallback-emoji { font-size: 34px; margin-bottom: 6px; }
         .card-fallback-name { font-size: 10px; font-weight: 700; line-height: 1.2; }
+
+        /* --- EFFET HOLOGRAPHIQUE (FOIL / SHINY) --- */
+        .foil-overlay {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            mix-blend-mode: color-dodge;
+            opacity: 0.85;
+            z-index: 5;
+        }
+
+        /* Foil Épique : Reflets aurore boréale / cosmiques */
+        .foil-epic {
+            background: radial-gradient(
+                circle at var(--foil-x) var(--foil-y),
+                rgba(255, 255, 255, 0.6) 0%,
+                rgba(163, 53, 238, 0.45) 25%,
+                rgba(0, 225, 255, 0.4) 45%,
+                rgba(255, 90, 180, 0.35) 65%,
+                transparent 85%
+            );
+            background-size: 140% 140%;
+        }
+
+        /* Foil Légendaire : Or pur étincelant & prisme arc-en-ciel */
+        .foil-legendary {
+            background: radial-gradient(
+                circle at var(--foil-x) var(--foil-y),
+                rgba(255, 255, 255, 0.75) 0%,
+                rgba(255, 215, 0, 0.65) 20%,
+                rgba(255, 60, 60, 0.45) 40%,
+                rgba(0, 255, 200, 0.5) 60%,
+                rgba(255, 170, 0, 0.55) 80%,
+                transparent 95%
+            );
+            background-size: 160% 160%;
+        }
 
         /* --- ÉCRAN D'OUVERTURE DE BOOSTER --- */
         #opening-screen {
@@ -481,6 +529,129 @@
             opacity: 0.8;
             pointer-events: none;
         }
+
+        /* --- ONGLET STATISTIQUES --- */
+        .stats-hero {
+            background: var(--secondary-bg);
+            border-radius: 18px;
+            padding: 22px;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.06);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .stats-user-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--button-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+        .stats-pct-main {
+            font-size: 42px;
+            font-weight: 900;
+            letter-spacing: -1px;
+            margin: 6px 0;
+        }
+        .stats-subtext {
+            font-size: 13px;
+            color: var(--hint-color);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: var(--secondary-bg);
+            border-radius: 14px;
+            padding: 16px;
+            border: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .stat-card-value {
+            font-size: 22px;
+            font-weight: 800;
+        }
+        .stat-card-label {
+            font-size: 12px;
+            color: var(--hint-color);
+            font-weight: 600;
+        }
+
+        .stats-section-title {
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--hint-color);
+            margin: 20px 0 10px 4px;
+        }
+
+        .rarity-stat-row {
+            background: var(--secondary-bg);
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-left: 4px solid transparent;
+        }
+        .rarity-stat-row.c { border-left-color: var(--color-common); }
+        .rarity-stat-row.r { border-left-color: var(--color-rare); }
+        .rarity-stat-row.e { border-left-color: var(--color-epic); }
+        .rarity-stat-row.l { border-left-color: var(--color-legendary); }
+
+        .rarity-name-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .rarity-symbols {
+            font-size: 11px;
+            color: var(--hint-color);
+            letter-spacing: 1px;
+        }
+        .rarity-count-tag {
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .favorite-card-box {
+            background: var(--secondary-bg);
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 25px;
+        }
+        .fav-thumb {
+            width: 55px;
+            aspect-ratio: 630 / 880;
+            border-radius: 6px;
+            overflow: hidden;
+            flex-shrink: 0;
+            background: #000;
+        }
+        .fav-info h4 {
+            font-size: 16px;
+            font-weight: 800;
+            margin-bottom: 3px;
+        }
+        .fav-info p {
+            font-size: 13px;
+            color: var(--hint-color);
+        }
     </style>
 </head>
 <body>
@@ -516,7 +687,80 @@
         </div>
     </div>
 
-    <!-- NAVIGATION DU BAS -->
+    <!-- ONGLET 3 : PROFIL & STATISTIQUES -->
+    <div id="tab-stats" class="tab-content">
+        <h2 style="font-size: 22px; font-weight: 800; margin-bottom: 16px;">Mes Statistiques</h2>
+
+        <div class="stats-hero">
+            <div class="stats-user-title" id="stats-user-name">Membre de la Band'à Joe</div>
+            <div class="stats-pct-main" id="stats-pct-big">0 %</div>
+            <div class="stats-subtext" id="stats-count-sub">0 sur 222 cartes collectées</div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-card-value" id="stat-total-packs">0</div>
+                <div class="stat-card-label">Boosters ouverts</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-value" id="stat-total-drawn">0</div>
+                <div class="stat-card-label">Cartes déballées</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-value" id="stat-duplicates-count">0</div>
+                <div class="stat-card-label">Doublons cumulés</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-value" id="stat-start-date">--/--</div>
+                <div class="stat-card-label">Début de l'album</div>
+            </div>
+        </div>
+
+        <div class="stats-section-title">Carte fétiche (plus de doublons)</div>
+        <div class="favorite-card-box" id="fav-card-box">
+            <div class="fav-thumb" id="fav-thumb"></div>
+            <div class="fav-info">
+                <h4 id="fav-name">Aucune carte</h4>
+                <p id="fav-copies">Ouvre des boosters pour la découvrir !</p>
+            </div>
+        </div>
+
+        <div class="stats-section-title">Détail par rareté</div>
+        
+        <div class="rarity-stat-row c">
+            <div class="rarity-name-badge">
+                <span>Commune</span>
+                <span class="rarity-symbols">◆</span>
+            </div>
+            <div class="rarity-count-tag" id="stat-count-common">0 / 149</div>
+        </div>
+
+        <div class="rarity-stat-row r">
+            <div class="rarity-name-badge">
+                <span>Rare</span>
+                <span class="rarity-symbols">◆◆</span>
+            </div>
+            <div class="rarity-count-tag" id="stat-count-rare">0 / 50</div>
+        </div>
+
+        <div class="rarity-stat-row e">
+            <div class="rarity-name-badge">
+                <span>Épique</span>
+                <span class="rarity-symbols">◆◆★</span>
+            </div>
+            <div class="rarity-count-tag" id="stat-count-epic">0 / 20</div>
+        </div>
+
+        <div class="rarity-stat-row l">
+            <div class="rarity-name-badge">
+                <span>Légendaire</span>
+                <span class="rarity-symbols">◆◆★★</span>
+            </div>
+            <div class="rarity-count-tag" id="stat-count-legendary">0 / 3</div>
+        </div>
+    </div>
+
+    <!-- NAVIGATION DU BAS (3 ONGLETS) -->
     <div class="bottom-nav">
         <div class="nav-item active" onclick="switchTab('shop')" id="nav-shop">
             <svg viewBox="0 0 24 24">
@@ -533,6 +777,12 @@
             </svg>
             Collection
         </div>
+        <div class="nav-item" onclick="switchTab('stats')" id="nav-stats">
+            <svg viewBox="0 0 24 24">
+                <path d="M5 19H19M7 15V19M12 9V19M17 5V19" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+            Stats
+        </div>
     </div>
 
     <!-- ÉCRAN D'OUVERTURE DE BOOSTER -->
@@ -544,7 +794,7 @@
         <div class="card-stage-container">
             <div class="card-stage-halo" id="card-halo"></div>
 
-            <div class="card-stage" onclick="handleCardClick()">
+            <div class="card-stage" onclick="handleCardClick()" onpointermove="handleFoilMove(event, this)">
                 <div class="card-3d-wrapper" id="card-3d">
                     
                     <!-- DOS -->
@@ -569,7 +819,7 @@
     <!-- MODAL DÉTAILS DE LA CARTE -->
     <div class="modal-overlay" id="card-modal" onclick="closeModal(event)">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-card-stage" id="modal-card-stage" onclick="toggleCardZoom(true)"></div>
+            <div class="modal-card-stage" id="modal-card-stage" onclick="toggleCardZoom(true)" onpointermove="handleFoilMove(event, this)"></div>
             <div class="zoom-tap-hint" onclick="toggleCardZoom(true)">🔍 Touche la carte pour zoomer</div>
             <div class="modal-rarity" id="modal-card-rarity">Rareté</div>
             <div class="modal-badge-count">Exemplaires possédés : <strong id="modal-card-count" style="color: var(--button-color); margin-left: 4px;">x0</strong></div>
@@ -577,8 +827,8 @@
         </div>
     </div>
 
-    <!-- OVERLAY ZOOM PLEIN ÉCRAN (CLIC POUR DÉZOOMER) -->
-    <div class="zoom-overlay" id="zoom-overlay" onclick="toggleCardZoom(false)">
+    <!-- OVERLAY ZOOM PLEIN ÉCRAN -->
+    <div class="zoom-overlay" id="zoom-overlay" onclick="toggleCardZoom(false)" onpointermove="handleFoilMove(event, this)">
         <div class="zoom-card-stage" id="zoom-card-stage"></div>
         <div class="zoom-hint">Touche pour réduire</div>
     </div>
@@ -596,14 +846,19 @@
             ? Object.values(CARDS_DB).reduce((sum, list) => sum + list.length, 0) 
             : 0;
 
-        // --- 3. SAUVEGARDE VIA CLOUDSTORAGE ---
+        // --- 3. SAUVEGARDE VIA CLOUDSTORAGE & STATS ---
         const PACK_REGEN_TIME = 10 * 60 * 1000; // 10 minutes
         const MAX_PACKS = 6;
 
         let state = {
             packs: MAX_PACKS,
             lastUpdate: Date.now(),
-            inventory: {}
+            inventory: {},
+            stats: {
+                packsOpened: 0,
+                cardsDrawn: 0,
+                firstOpenedAt: null
+            }
         };
 
         function saveState() {
@@ -616,19 +871,27 @@
         }
 
         function loadState(callback) {
-            if (tg?.CloudStorage) {
-                tg.CloudStorage.getItem('tma_gacha_v1', (err, value) => {
-                    if (!err && value) {
-                        try { state = JSON.parse(value); } catch(e){}
-                    }
-                    callback();
-                });
-            } else {
-                const local = localStorage.getItem('tma_gacha_v1');
-                if (local) {
-                    try { state = JSON.parse(local); } catch(e){}
+            const handleLoadedData = (value) => {
+                if (value) {
+                    try {
+                        const parsed = JSON.parse(value);
+                        state = {
+                            ...state,
+                            ...parsed,
+                            stats: { ...state.stats, ...(parsed.stats || {}) }
+                        };
+                    } catch(e){}
                 }
                 callback();
+            };
+
+            if (tg?.CloudStorage) {
+                tg.CloudStorage.getItem('tma_gacha_v1', (err, value) => {
+                    if (!err && value) handleLoadedData(value);
+                    else handleLoadedData(localStorage.getItem('tma_gacha_v1'));
+                });
+            } else {
+                handleLoadedData(localStorage.getItem('tma_gacha_v1'));
             }
         }
 
@@ -646,10 +909,16 @@
             };
 
             if (param === 'reset') {
-                state = { packs: MAX_PACKS, lastUpdate: Date.now(), inventory: {} };
+                state = {
+                    packs: MAX_PACKS,
+                    lastUpdate: Date.now(),
+                    inventory: {},
+                    stats: { packsOpened: 0, cardsDrawn: 0, firstOpenedAt: null }
+                };
                 saveState();
                 renderEnergyUI();
                 renderCollection();
+                renderStatsUI();
                 notify("Données réinitialisées avec succès !");
                 return;
             }
@@ -682,6 +951,7 @@
                     state.inventory[cardId] = (state.inventory[cardId] || 0) + 1;
                     saveState();
                     renderCollection();
+                    renderStatsUI();
                     notify(`Carte obtenue : N°${cardId} (${targetCard.name}) !`);
                 } else {
                     notify(`Erreur : la carte N°${cardId} n'existe pas.`);
@@ -730,8 +1000,8 @@
 
             if (slotIndex < 2) {
                 if (roll < 82.0) rarity = 'common';       // 82.0%
-                else if (roll < 97.9) rarity = 'rare';     // 15.9%
-                else if (roll < 99.9) rarity = 'epic';     // 2%
+                else if (roll < 98.9) rarity = 'rare';     // 16.9%
+                else if (roll < 99.9) rarity = 'epic';     // 1%
                 else rarity = 'legendary';                 // 0.1%
             } else {
                 if (roll < 60.0) rarity = 'common';        // 60.0%
@@ -758,6 +1028,12 @@
 
             state.packs--;
             if (state.packs === MAX_PACKS - 1) state.lastUpdate = Date.now();
+
+            // Stats
+            state.stats.packsOpened++;
+            state.stats.cardsDrawn += 3;
+            if (!state.stats.firstOpenedAt) state.stats.firstOpenedAt = Date.now();
+
             saveState();
             renderEnergyUI();
 
@@ -863,17 +1139,54 @@
             }
         }
 
-        // --- 8. GÉNÉRATEUR VISUEL DE CARTE ---
+        // --- 8. GÉNÉRATEUR VISUEL DE CARTE AVEC COUCHE FOIL ---
         function generateCardHTML(card) {
+            const isFoil = (card.rarity === 'epic' || card.rarity === 'legendary');
+            const foilLayer = isFoil ? `<div class="foil-overlay foil-${card.rarity}"></div>` : '';
+
             if (card.image && card.image.trim() !== '') {
-                return `<img class="card-image" src="${card.image}" alt="${card.name}" loading="lazy" />`;
+                return `
+                    <div class="card-wrapper-rel">
+                        <img class="card-image" src="${card.image}" alt="${card.name}" loading="lazy" />
+                        ${foilLayer}
+                    </div>
+                `;
             }
             return `
-                <div class="card-fallback">
-                    <div class="card-fallback-emoji">${card.emoji}</div>
-                    <div class="card-fallback-name">${card.name}</div>
+                <div class="card-wrapper-rel">
+                    <div class="card-fallback">
+                        <div class="card-fallback-emoji">${card.emoji}</div>
+                        <div class="card-fallback-name">${card.name}</div>
+                    </div>
+                    ${foilLayer}
                 </div>
             `;
+        }
+
+        // --- GESTION DES REFLETS FOIL (DOIGT / TOUCHER) ---
+        function handleFoilMove(e, container) {
+            const rect = container.getBoundingClientRect();
+            const clientX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
+            const clientY = e.clientY || (e.touches && e.touches[0].clientY) || 0;
+
+            const x = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100));
+            const y = Math.max(0, Math.min(100, ((clientY - rect.top) / rect.height) * 100));
+
+            document.documentElement.style.setProperty('--foil-x', `${x}%`);
+            document.documentElement.style.setProperty('--foil-y', `${y}%`);
+        }
+
+        // Gyroscope mobile pour les reflets Foil
+        if (window.DeviceOrientationEvent) {
+            window.addEventListener('deviceorientation', (e) => {
+                if (e.gamma !== null && e.beta !== null) {
+                    // Gamma: gauche/droite (-90 à 90), Beta: avant/arrière (-180 à 180)
+                    const x = Math.max(10, Math.min(90, ((e.gamma + 45) / 90) * 100));
+                    const y = Math.max(10, Math.min(90, ((e.beta - 20) / 90) * 100));
+                    document.documentElement.style.setProperty('--foil-x', `${x}%`);
+                    document.documentElement.style.setProperty('--foil-y', `${y}%`);
+                }
+            }, true);
         }
 
         // --- 9. COLLECTION ---
@@ -958,7 +1271,76 @@
             }
         }
 
-        // --- 11. NAVIGATION ---
+        // --- 11. ONGLET STATISTIQUES DU JOUEUR ---
+        function renderStatsUI() {
+            if (typeof CARDS_DB === 'undefined') return;
+
+            // Pseudo Telegram si présent
+            const user = tg?.initDataUnsafe?.user;
+            if (user?.first_name) {
+                document.getElementById('stats-user-name').innerText = user.first_name + (user.last_name ? ` ${user.last_name}` : '');
+            }
+
+            // Calcul par rareté
+            const cOwned = CARDS_DB.common.filter(c => (state.inventory[c.id] || 0) > 0).length;
+            const rOwned = CARDS_DB.rare.filter(c => (state.inventory[c.id] || 0) > 0).length;
+            const eOwned = CARDS_DB.epic.filter(c => (state.inventory[c.id] || 0) > 0).length;
+            const lOwned = CARDS_DB.legendary.filter(c => (state.inventory[c.id] || 0) > 0).length;
+
+            const totalOwned = cOwned + rOwned + eOwned + lOwned;
+            const pct = TOTAL_CARDS > 0 ? ((totalOwned / TOTAL_CARDS) * 100).toFixed(1) : 0;
+
+            document.getElementById('stats-pct-big').innerText = `${pct} %`;
+            document.getElementById('stats-count-sub').innerText = `${totalOwned} sur ${TOTAL_CARDS} cartes collectées`;
+
+            document.getElementById('stat-count-common').innerText = `${cOwned} / ${CARDS_DB.common.length}`;
+            document.getElementById('stat-count-rare').innerText = `${rOwned} / ${CARDS_DB.rare.length}`;
+            document.getElementById('stat-count-epic').innerText = `${eOwned} / ${CARDS_DB.epic.length}`;
+            document.getElementById('stat-count-legendary').innerText = `${lOwned} / ${CARDS_DB.legendary.length}`;
+
+            // Chiffres globaux
+            document.getElementById('stat-total-packs').innerText = state.stats.packsOpened || 0;
+            document.getElementById('stat-total-drawn').innerText = state.stats.cardsDrawn || 0;
+
+            // Total de doublons
+            const totalDuplicates = Object.values(state.inventory).reduce((acc, count) => acc + Math.max(0, count - 1), 0);
+            document.getElementById('stat-duplicates-count').innerText = totalDuplicates;
+
+            // Date de début
+            if (state.stats.firstOpenedAt) {
+                const d = new Date(state.stats.firstOpenedAt);
+                document.getElementById('stat-start-date').innerText = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}`;
+            } else {
+                document.getElementById('stat-start-date').innerText = "--/--";
+            }
+
+            // Détection de la carte fétiche
+            let maxCount = 0;
+            let favCardId = null;
+
+            for (const [id, count] of Object.entries(state.inventory)) {
+                if (count > maxCount) {
+                    maxCount = count;
+                    favCardId = id;
+                }
+            }
+
+            if (favCardId && maxCount > 0) {
+                let favCard = null;
+                for (const list of Object.values(CARDS_DB)) {
+                    const found = list.find(c => c.id === favCardId);
+                    if (found) { favCard = found; break; }
+                }
+
+                if (favCard) {
+                    document.getElementById('fav-name').innerText = favCard.name;
+                    document.getElementById('fav-copies').innerText = `Possédée en ${maxCount} exemplaire${maxCount > 1 ? 's' : ''}`;
+                    document.getElementById('fav-thumb').innerHTML = generateCardHTML(favCard);
+                }
+            }
+        }
+
+        // --- 12. NAVIGATION ---
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -967,10 +1349,11 @@
             document.getElementById(`nav-${tabId}`).classList.add('active');
 
             if (tabId === 'collection') renderCollection();
+            if (tabId === 'stats') renderStatsUI();
             if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
         }
 
-        // --- 12. DÉMARRAGE ---
+        // --- 13. DÉMARRAGE ---
         loadState(() => {
             checkUrlCheats();
             renderEnergyUI();
