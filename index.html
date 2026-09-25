@@ -16,19 +16,16 @@
             --button-text-color: var(--tg-theme-button-text-color, #ffffff);
             --secondary-bg: var(--tg-theme-secondary-bg-color, #1a232f);
             
-            /* Couleurs de rareté officielles */
             --color-common: #95a5b5;
             --color-rare: #0094ff;
             --color-epic: #a335ee;
             --color-legendary: #ffaa00;
 
-            /* Halos lumineux projetés derrière la carte */
             --halo-common: rgba(149, 165, 181, 0.45);
             --halo-rare: rgba(0, 148, 255, 0.7);
             --halo-epic: rgba(163, 53, 238, 0.85);
             --halo-legendary: rgba(255, 170, 0, 0.95);
 
-            /* Positions interactives pour le reflet Foil */
             --foil-x: 50%;
             --foil-y: 50%;
         }
@@ -121,12 +118,37 @@
         .pack-btn:active { transform: scale(0.98); }
         .pack-btn:disabled { background: #333e4d; color: #6d7b8b; cursor: not-allowed; box-shadow: none; }
 
-        /* --- MA COLLECTION --- */
+        /* --- VUE COLLECTION & ALBUMS --- */
+        .collection-view-switch {
+            display: flex;
+            background: var(--secondary-bg);
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .switch-btn {
+            flex: 1;
+            padding: 8px 10px;
+            border: none;
+            background: transparent;
+            color: var(--hint-color);
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: 9px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .switch-btn.active {
+            background: var(--button-color);
+            color: var(--button-text-color);
+        }
+
         .progress-bar-container {
             background: var(--secondary-bg);
             border-radius: 10px;
             height: 22px;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
             position: relative;
             overflow: hidden;
             border: 1px solid rgba(255,255,255,0.05);
@@ -142,6 +164,102 @@
             top: 0; left: 0; width: 100%; height: 100%;
             display: flex; align-items: center; justify-content: center;
             font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+        }
+
+        /* Barre des catégories thématiques */
+        .album-categories-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .cat-pill-btn {
+            flex: 1;
+            padding: 8px 6px;
+            border-radius: 10px;
+            background: var(--secondary-bg);
+            color: var(--hint-color);
+            border: 1px solid rgba(255,255,255,0.06);
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+        .cat-pill-btn.active {
+            background: rgba(36, 129, 204, 0.2);
+            color: #5bb2ff;
+            border-color: rgba(36, 129, 204, 0.5);
+        }
+
+        /* Défilement horizontal des albums */
+        .album-chips-scroll {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            margin-bottom: 16px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .album-chips-scroll::-webkit-scrollbar { display: none; }
+        .album-chip {
+            flex-shrink: 0;
+            background: var(--secondary-bg);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+        .album-chip.active {
+            background: var(--button-color);
+            color: #fff;
+            border-color: var(--button-color);
+        }
+        .album-chip-count {
+            font-size: 10px;
+            opacity: 0.8;
+            font-weight: 800;
+        }
+
+        /* En-tête de l'album sélectionné */
+        .album-header-card {
+            background: var(--secondary-bg);
+            border-radius: 14px;
+            padding: 14px 16px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .album-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .album-title-text {
+            font-size: 16px;
+            font-weight: 800;
+        }
+        .album-filter-toggle {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--hint-color);
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 4px 8px;
+            cursor: pointer;
+        }
+        .album-filter-toggle.active {
+            color: #ffaa00;
+            border-color: rgba(255, 170, 0, 0.4);
+            background: rgba(255, 170, 0, 0.1);
         }
 
         .collection-grid {
@@ -177,6 +295,55 @@
         .rarity-epic { filter: drop-shadow(0 0 11px var(--halo-epic)); }
         .rarity-legendary { filter: drop-shadow(0 0 14px var(--halo-legendary)); }
 
+        .card-badge-owned {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: rgba(0, 0, 0, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 1px 5px;
+            border-radius: 6px;
+            z-index: 6;
+        }
+
+        /* Silhouette / Emplacement de carte manquante */
+        .card-frame-locked {
+            aspect-ratio: 630 / 880;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1.5px dashed rgba(255, 255, 255, 0.15);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--hint-color);
+            padding: 8px;
+            text-align: center;
+            gap: 6px;
+            user-select: none;
+            transition: transform 0.15s ease;
+        }
+        .card-frame-locked:active { transform: scale(0.97); }
+        .card-locked-num {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--hint-color);
+        }
+        .card-locked-name {
+            font-size: 10px;
+            font-weight: 600;
+            opacity: 0.65;
+            line-height: 1.2;
+            word-break: break-word;
+        }
+        .card-locked-icon {
+            font-size: 18px;
+            opacity: 0.5;
+        }
+
         .card-wrapper-rel {
             position: relative;
             width: 100%;
@@ -204,7 +371,7 @@
         .card-fallback-emoji { font-size: 34px; margin-bottom: 6px; }
         .card-fallback-name { font-size: 10px; font-weight: 700; line-height: 1.2; }
 
-        /* --- EFFET HOLOGRAPHIQUE (FOIL / SHINY) --- */
+        /* --- EFFET HOLOGRAPHIQUE (FOIL) --- */
         .foil-overlay {
             position: absolute;
             inset: 0;
@@ -213,8 +380,6 @@
             opacity: 0.85;
             z-index: 5;
         }
-
-        /* Foil Épique : Reflets aurore boréale / cosmiques */
         .foil-epic {
             background: radial-gradient(
                 circle at var(--foil-x) var(--foil-y),
@@ -226,8 +391,6 @@
             );
             background-size: 140% 140%;
         }
-
-        /* Foil Légendaire : Or pur étincelant & prisme arc-en-ciel */
         .foil-legendary {
             background: radial-gradient(
                 circle at var(--foil-x) var(--foil-y),
@@ -253,7 +416,6 @@
             justify-content: center;
             padding: 20px;
         }
-
         .reveal-header {
             position: absolute;
             top: 36px;
@@ -263,7 +425,6 @@
             text-transform: uppercase;
             letter-spacing: 1.5px;
         }
-
         .new-card-badge {
             margin-bottom: 12px;
             padding: 3px 10px;
@@ -288,7 +449,6 @@
             opacity: 1;
             transform: translateY(0);
         }
-
         .card-stage-container {
             position: relative;
             width: min(280px, 75vw);
@@ -297,7 +457,6 @@
             align-items: center;
             justify-content: center;
         }
-
         .card-stage-halo {
             position: absolute;
             inset: -30px;
@@ -309,7 +468,6 @@
             z-index: 1;
         }
         .card-stage-halo.active { opacity: 1; }
-
         .card-stage {
             width: 100%;
             height: 100%;
@@ -318,7 +476,6 @@
             z-index: 2;
             cursor: pointer;
         }
-
         .card-3d-wrapper {
             width: 100%;
             height: 100%;
@@ -326,13 +483,8 @@
             transform-style: preserve-3d;
             transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
-
-        .slide-in-right {
-            animation: slideInRight 0.35s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
-        }
-        .slide-out-left {
-            animation: slideOutLeft 0.3s cubic-bezier(0.8, 0, 0.9, 0.2) forwards;
-        }
+        .slide-in-right { animation: slideInRight 0.35s cubic-bezier(0.1, 0.9, 0.2, 1) forwards; }
+        .slide-out-left { animation: slideOutLeft 0.3s cubic-bezier(0.8, 0, 0.9, 0.2) forwards; }
 
         @keyframes slideInRight {
             0% { transform: translateX(130%) scale(0.85); opacity: 0; }
@@ -343,17 +495,13 @@
             100% { transform: translateX(-130%) rotateY(180deg) scale(0.8); opacity: 0; }
         }
 
-        .card-3d-wrapper.flipped {
-            transform: rotateY(180deg);
-        }
-
+        .card-3d-wrapper.flipped { transform: rotateY(180deg); }
         .card-face {
             position: absolute;
             inset: 0;
             backface-visibility: hidden;
             -webkit-backface-visibility: hidden;
         }
-
         .card-face.back {
             background: linear-gradient(135deg, #18283b, #0e1722);
             display: flex;
@@ -376,7 +524,6 @@
         }
         .back-pattern svg { width: 50px; height: 50px; fill: #2481cc; opacity: 0.8; }
         .back-pattern span { font-size: 11px; font-weight: 800; letter-spacing: 2px; color: #4e7399; text-transform: uppercase; }
-
         .card-face.front {
             transform: rotateY(180deg);
             background: transparent;
@@ -399,7 +546,7 @@
         }
         @keyframes pulseHint { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
 
-        /* --- MODAL DÉTAILS DE LA CARTE --- */
+        /* --- MODAL DÉTAILS & ZOOM --- */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -415,7 +562,6 @@
             transition: opacity 0.25s ease;
         }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
-
         .modal-content {
             background: var(--secondary-bg);
             border-radius: 20px;
@@ -431,7 +577,6 @@
             transition: transform 0.25s ease;
         }
         .modal-overlay.active .modal-content { transform: translateY(0); }
-
         .modal-card-stage {
             width: 180px;
             aspect-ratio: 630 / 880;
@@ -440,10 +585,7 @@
             transition: filter 0.3s ease, transform 0.15s ease;
             cursor: zoom-in;
         }
-        .modal-card-stage:active {
-            transform: scale(0.97);
-        }
-
+        .modal-card-stage:active { transform: scale(0.97); }
         .zoom-tap-hint {
             font-size: 11px;
             font-weight: 600;
@@ -453,7 +595,6 @@
             opacity: 0.75;
             cursor: pointer;
         }
-
         .modal-rarity { 
             font-size: 13px; 
             font-weight: 800; 
@@ -483,7 +624,6 @@
         }
         .modal-close-btn:active { background: rgba(255,255,255,0.15); }
 
-        /* --- OVERLAY ZOOM PLEIN ÉCRAN --- */
         .zoom-overlay {
             position: fixed;
             inset: 0;
@@ -500,11 +640,7 @@
             transition: opacity 0.25s ease;
             cursor: zoom-out;
         }
-        .zoom-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
+        .zoom-overlay.active { opacity: 1; pointer-events: auto; }
         .zoom-card-stage {
             width: min(92vw, 420px);
             max-height: 84vh;
@@ -516,10 +652,7 @@
             justify-content: center;
             cursor: zoom-out;
         }
-        .zoom-overlay.active .zoom-card-stage {
-            transform: scale(1);
-        }
-
+        .zoom-overlay.active .zoom-card-stage { transform: scale(1); }
         .zoom-hint {
             margin-top: 18px;
             font-size: 13px;
@@ -530,7 +663,7 @@
             pointer-events: none;
         }
 
-        /* --- ONGLET STATISTIQUES --- */
+        /* --- ONGLET STATS --- */
         .stats-hero {
             background: var(--secondary-bg);
             border-radius: 18px;
@@ -548,17 +681,8 @@
             letter-spacing: 1px;
             margin-bottom: 4px;
         }
-        .stats-pct-main {
-            font-size: 42px;
-            font-weight: 900;
-            letter-spacing: -1px;
-            margin: 6px 0;
-        }
-        .stats-subtext {
-            font-size: 13px;
-            color: var(--hint-color);
-        }
-
+        .stats-pct-main { font-size: 42px; font-weight: 900; letter-spacing: -1px; margin: 6px 0; }
+        .stats-subtext { font-size: 13px; color: var(--hint-color); }
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -574,16 +698,8 @@
             flex-direction: column;
             gap: 4px;
         }
-        .stat-card-value {
-            font-size: 22px;
-            font-weight: 800;
-        }
-        .stat-card-label {
-            font-size: 12px;
-            color: var(--hint-color);
-            font-weight: 600;
-        }
-
+        .stat-card-value { font-size: 22px; font-weight: 800; }
+        .stat-card-label { font-size: 12px; color: var(--hint-color); font-weight: 600; }
         .stats-section-title {
             font-size: 14px;
             font-weight: 800;
@@ -592,7 +708,6 @@
             color: var(--hint-color);
             margin: 20px 0 10px 4px;
         }
-
         .rarity-stat-row {
             background: var(--secondary-bg);
             border-radius: 12px;
@@ -607,24 +722,9 @@
         .rarity-stat-row.r { border-left-color: var(--color-rare); }
         .rarity-stat-row.e { border-left-color: var(--color-epic); }
         .rarity-stat-row.l { border-left-color: var(--color-legendary); }
-
-        .rarity-name-badge {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 700;
-            font-size: 14px;
-        }
-        .rarity-symbols {
-            font-size: 11px;
-            color: var(--hint-color);
-            letter-spacing: 1px;
-        }
-        .rarity-count-tag {
-            font-size: 14px;
-            font-weight: 800;
-        }
-
+        .rarity-name-badge { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; }
+        .rarity-symbols { font-size: 11px; color: var(--hint-color); letter-spacing: 1px; }
+        .rarity-count-tag { font-size: 14px; font-weight: 800; }
         .favorite-card-box {
             background: var(--secondary-bg);
             border-radius: 14px;
@@ -643,15 +743,8 @@
             flex-shrink: 0;
             background: #000;
         }
-        .fav-info h4 {
-            font-size: 16px;
-            font-weight: 800;
-            margin-bottom: 3px;
-        }
-        .fav-info p {
-            font-size: 13px;
-            color: var(--hint-color);
-        }
+        .fav-info h4 { font-size: 16px; font-weight: 800; margin-bottom: 3px; }
+        .fav-info p { font-size: 13px; color: var(--hint-color); }
     </style>
 </head>
 <body>
@@ -673,17 +766,53 @@
         </button>
     </div>
 
-    <!-- ONGLET 2 : MA COLLECTION -->
+    <!-- ONGLET 2 : MA COLLECTION & ALBUMS -->
     <div id="tab-collection" class="tab-content">
-        <h2 style="font-size: 22px; font-weight: 800; margin-bottom: 12px;">Ma Collection</h2>
-        
-        <div class="progress-bar-container">
-            <div class="progress-bar-fill" id="progress-fill"></div>
-            <div class="progress-text" id="progress-text">0 / 0 cartes</div>
+        <h2 style="font-size: 22px; font-weight: 800; margin-bottom: 14px;">Ma Collection</h2>
+
+        <!-- Switch de mode de vue -->
+        <div class="collection-view-switch">
+            <button class="switch-btn active" id="btn-view-global" onclick="setCollectionViewMode('global')">🗃️ Toutes mes cartes</button>
+            <button class="switch-btn" id="btn-view-albums" onclick="setCollectionViewMode('albums')">📖 Albums Thématiques</button>
         </div>
 
-        <div class="collection-grid" id="collection-grid">
-            <!-- Rempli par JavaScript -->
+        <!-- VUE 1 : GLOBALE -->
+        <div id="view-mode-global-container">
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="progress-fill"></div>
+                <div class="progress-text" id="progress-text">0 / 0 cartes</div>
+            </div>
+            <div class="collection-grid" id="collection-grid"></div>
+        </div>
+
+        <!-- VUE 2 : ALBUMS THÉMATIQUES -->
+        <div id="view-mode-albums-container" style="display: none;">
+            <!-- Piliers de catégories -->
+            <div class="album-categories-bar">
+                <button class="cat-pill-btn active" id="cat-btn-fanfares" onclick="selectAlbumCategory('fanfares')">🎺 Fanfares</button>
+                <button class="cat-pill-btn" id="cat-btn-promos" onclick="selectAlbumCategory('promos')">🎓 Séries</button>
+                <button class="cat-pill-btn" id="cat-btn-instruments" onclick="selectAlbumCategory('instruments')">🎷 Instruments</button>
+            </div>
+
+            <!-- Chips d'albums défilables -->
+            <div class="album-chips-scroll" id="album-chips-container"></div>
+
+            <!-- Panneau détail de l'album -->
+            <div class="album-header-card">
+                <div class="album-header-top">
+                    <div class="album-title-text" id="album-detail-title">Album</div>
+                    <button class="album-filter-toggle" id="album-filter-missing-btn" onclick="toggleAlbumMissingOnly()">
+                        🔒 Manquantes
+                    </button>
+                </div>
+                <div class="progress-bar-container" style="margin-bottom: 0;">
+                    <div class="progress-bar-fill" id="album-progress-fill"></div>
+                    <div class="progress-text" id="album-progress-text">0 / 0 cartes</div>
+                </div>
+            </div>
+
+            <!-- Grille des cartes de l'album sélectionné -->
+            <div class="collection-grid" id="album-collection-grid"></div>
         </div>
     </div>
 
@@ -760,7 +889,7 @@
         </div>
     </div>
 
-    <!-- NAVIGATION DU BAS (3 ONGLETS) -->
+    <!-- NAVIGATION BAS -->
     <div class="bottom-nav">
         <div class="nav-item active" onclick="switchTab('shop')" id="nav-shop">
             <svg viewBox="0 0 24 24">
@@ -788,7 +917,6 @@
     <!-- ÉCRAN D'OUVERTURE DE BOOSTER -->
     <div id="opening-screen">
         <div class="reveal-header">Carte <span id="reveal-current">1</span> / 3</div>
-
         <div class="new-card-badge" id="new-card-badge">✨ Nouvelle</div>
 
         <div class="card-stage-container">
@@ -796,8 +924,6 @@
 
             <div class="card-stage" onclick="handleCardClick()" onpointermove="handleFoilMove(event, this)">
                 <div class="card-3d-wrapper" id="card-3d">
-                    
-                    <!-- DOS -->
                     <div class="card-face back">
                         <div class="back-pattern">
                             <svg viewBox="0 0 24 24">
@@ -806,10 +932,7 @@
                             <span>TCG</span>
                         </div>
                     </div>
-
-                    <!-- FACE AVANT -->
                     <div class="card-face front" id="reveal-card-front"></div>
-
                 </div>
             </div>
             <div class="tap-hint" id="tap-hint">Touche la carte pour révéler</div>
@@ -846,8 +969,70 @@
             ? Object.values(CARDS_DB).reduce((sum, list) => sum + list.length, 0) 
             : 0;
 
-        // --- 3. SAUVEGARDE VIA CLOUDSTORAGE & STATS ---
-        const PACK_REGEN_TIME = 10 * 60 * 1000; // 10 minutes
+        function getCardById(id) {
+            if (typeof CARDS_DB === 'undefined') return null;
+            for (const [rarity, list] of Object.entries(CARDS_DB)) {
+                const found = list.find(c => c.id === id);
+                if (found) return { ...found, rarity };
+            }
+            return null;
+        }
+
+        // --- 3. BASE DE DONNÉES DES ALBUMS THÉMATIQUES ---
+        const ALBUMS_DB = {
+            fanfares: {
+                title: "Fanfares Associées",
+                icon: "🎺",
+                sets: {
+                    "SZ": ["001", "002", "003", "004", "005", "006", "007", "009", "010", "011", "012", "013", "014", "015", "016", "017", "201", "222"],
+                    "TNT": ["070", "071", "072", "073", "075", "076", "077", "078", "079", "082", "083", "084", "085", "086", "087", "088", "089", "090", "091", "106", "202"],
+                    "DLK": ["038", "039", "041", "042", "045", "047", "051", "055", "057", "058", "059", "060", "063", "064", "065", "066", "067", "204"],
+                    "OBB": ["109", "110", "111", "112", "115", "117", "118", "120", "124", "126", "127", "128", "131", "132", "133", "134", "135", "200"],
+                    "VCP": ["093", "094", "096", "099", "100", "103", "104", "106", "108", "203"]
+                }
+            },
+            promos: {
+                title: "Promotions & Séries",
+                icon: "🎓",
+                sets: {
+                    "youri": ["007", "008", "009"],
+                    "P23": ["092", "093", "094", "095", "096", "097", "098", "099", "100", "101", "102", "103", "104", "105", "106", "107", "108"],
+                    "P24": ["046", "070", "071", "072", "073", "074", "075", "076", "077", "078", "079", "080", "081", "082", "083", "084", "085", "086", "087", "088", "089", "090", "091", "106"],
+                    "P25": ["025", "037", "041", "042", "043", "044", "045", "046", "047", "048", "049", "050", "051", "052", "053", "054", "055", "056", "057", "058", "059", "060", "061", "062", "063", "064", "065", "066", "067", "068", "069"],
+                    "P26": ["001", "002", "003", "004", "005", "006", "007", "008", "009", "010", "011", "012", "013", "014", "015", "016", "017", "018", "019", "020", "021", "022", "023", "024", "026", "027", "028", "029", "030", "031", "032", "033", "034", "035", "036", "037", "040", "058", "222"],
+                    "P27": ["025", "038", "039", "109", "110", "111", "112", "113", "114", "115", "116", "117", "118", "119", "120", "121", "122", "123", "124", "125", "126", "127", "128", "129", "130", "131", "132", "133", "134", "135"],
+                    "P28": ["136", "137", "138", "139", "140", "141", "142", "143", "144", "145", "146", "147", "148"],
+                    "CS": ["180", "181", "182", "183", "184", "185", "186", "187", "188", "189"],
+                    "Fanf": ["193", "200", "201", "202", "203", "204", "205", "206", "207", "208", "209", "210", "221"],
+                    "Répertoire": ["149", "150", "151", "152", "153", "154", "155", "156", "157", "158", "159", "160", "161", "162", "163", "164", "165", "166", "167", "168", "169", "170", "171", "172", "173", "174", "175", "176", "177", "178", "179"],
+                    "Traditions": ["190", "191", "192", "194", "195", "196", "197", "198", "199", "211", "212", "213", "214", "215", "216", "217", "218", "219", "220"]
+                }
+            },
+            instruments: {
+                title: "Répartition par Instrument",
+                icon: "🎷",
+                sets: {
+                    "Trompette": ["006", "008", "009", "010", "011", "014", "018", "021", "026", "027", "034", "038", "039", "040", "041", "042", "043", "072", "073", "074", "075", "089", "091", "093", "094", "095", "096", "098", "099", "104", "106", "117", "118", "119", "120", "121", "122", "123", "136", "137"],
+                    "Trombone": ["001", "008", "011", "016", "017", "025", "030", "032", "035", "059", "060", "061", "062", "063", "064", "065", "076", "078", "079", "080", "092", "099", "100", "101", "102", "103", "107", "124", "125", "126", "127", "128", "129", "138"],
+                    "Sax Alto": ["007", "012", "013", "015", "022", "023", "029", "036", "037", "050", "051", "052", "053", "054", "055", "057", "058", "077", "081", "082", "083", "084", "104", "109", "112", "113", "114", "115", "116", "146", "147", "148"],
+                    "Sax Ténor": ["001", "002", "003", "019", "067", "068", "069", "085", "086", "087", "094", "110", "111", "130", "131", "132", "139", "140", "222"],
+                    "Sax Baryton": ["003", "055", "083", "108", "111"],
+                    "Percussions": ["002", "016", "018", "020", "024", "044", "045", "046", "047", "055", "088", "089", "090", "091", "097", "103", "106", "115", "134", "144", "145"],
+                    "Euphonium": ["004", "028", "031", "033", "066", "076", "077", "107", "108", "133", "141"],
+                    "Soubassophone": ["001", "005", "007", "014", "018", "048", "049", "066", "070", "071", "093", "103", "135", "142", "143", "145"],
+                    "Clarinette": ["056"]
+                }
+            }
+        };
+
+        // État de navigation des albums
+        let currentCollectionMode = 'global'; // 'global' | 'albums'
+        let currentAlbumCat = 'fanfares';
+        let currentAlbumSet = 'SZ';
+        let isAlbumFilterMissingOnly = false;
+
+        // --- 4. SAUVEGARDE VIA CLOUDSTORAGE & STATS ---
+        const PACK_REGEN_TIME = 10 * 60 * 1000;
         const MAX_PACKS = 6;
 
         let state = {
@@ -895,98 +1080,25 @@
             }
         }
 
-        // --- 4. COMMANDES PAR LIEN (CHEATS) ---
-        function checkUrlCheats() {
-            const param = tg?.initDataUnsafe?.start_param 
-                || new URLSearchParams(window.location.search).get('startapp') 
-                || new URLSearchParams(window.location.search).get('cheat');
-
-            if (!param) return;
-
-            const notify = (msg) => {
-                if (tg?.showAlert) tg.showAlert(msg);
-                else alert(msg);
-            };
-
-            if (param === 'reset') {
-                state = {
-                    packs: MAX_PACKS,
-                    lastUpdate: Date.now(),
-                    inventory: {},
-                    stats: { packsOpened: 0, cardsDrawn: 0, firstOpenedAt: null }
-                };
-                saveState();
-                renderEnergyUI();
-                renderCollection();
-                renderStatsUI();
-                notify("Données réinitialisées avec succès !");
-                return;
-            }
-
-            if (param === 'boosters' || param === 'packs' || param === 'booster') {
-                state.packs = MAX_PACKS;
-                state.lastUpdate = Date.now();
-                saveState();
-                renderEnergyUI();
-                notify("Boosters rechargés au maximum (6/6) !");
-                return;
-            }
-
-            if (param.startsWith('give_') || param.startsWith('card_')) {
-                const rawNum = param.replace(/^(give_|card_)/, '');
-                const cardId = rawNum.padStart(3, '0');
-
-                let targetCard = null;
-                if (typeof CARDS_DB !== 'undefined') {
-                    for (const category of Object.values(CARDS_DB)) {
-                        const found = category.find(c => c.id === cardId);
-                        if (found) {
-                            targetCard = found;
-                            break;
-                        }
-                    }
-                }
-
-                if (targetCard) {
-                    state.inventory[cardId] = (state.inventory[cardId] || 0) + 1;
-                    saveState();
-                    renderCollection();
-                    renderStatsUI();
-                    notify(`Carte obtenue : N°${cardId} (${targetCard.name}) !`);
-                } else {
-                    notify(`Erreur : la carte N°${cardId} n'existe pas.`);
-                }
-            }
-        }
-
-        // --- 5. GESTION DU TEMPS ANTI-TRICHE & ÉNERGIE ---
+        // --- 5. GESTION DU TEMPS SÉCURISÉE (ANTI-TRICHE) & ÉNERGIE ---
         let serverTimeOffset = 0;
         let isTimeSynced = false;
 
-        // Récupère l'heure réelle via l'en-tête HTTP du serveur GitHub Pages
         async function syncServerTime() {
             try {
-                const res = await fetch(window.location.href, { 
-                    method: 'HEAD', 
-                    cache: 'no-store' 
-                });
+                const res = await fetch(window.location.href, { method: 'HEAD', cache: 'no-store' });
                 const serverHeader = res.headers.get('date');
                 if (serverHeader) {
                     const trueServerTime = new Date(serverHeader).getTime();
-                    // Calcule le repère temporel infalsifiable
                     serverTimeOffset = trueServerTime - performance.now();
                     isTimeSynced = true;
                     updateEnergy();
                 }
             } catch (e) {
-                console.warn("Impossible de synchroniser l'heure serveur, fallback local.");
-                if (!isTimeSynced) {
-                    serverTimeOffset = Date.now() - performance.now();
-                }
+                if (!isTimeSynced) serverTimeOffset = Date.now() - performance.now();
             }
         }
 
-        // Retourne l'heure réelle actuelle sans subir les changements d'heure du téléphone
         function getTrueNow() {
             return Math.floor(serverTimeOffset + performance.now());
         }
@@ -994,7 +1106,6 @@
         function updateEnergy() {
             const now = getTrueNow();
 
-            // Sécurité anti-retour en arrière dans le temps
             if (now < state.lastUpdate) {
                 state.lastUpdate = now;
                 saveState();
@@ -1033,28 +1144,79 @@
             openBtn.innerText = state.packs > 0 ? "Ouvrir 1 Booster (3 cartes)" : "Recharge en cours...";
         }
 
-        // Re-synchronisation si le joueur minimise puis ré-ouvre Telegram
         document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'visible') {
-                syncServerTime();
-            }
+            if (document.visibilityState === 'visible') syncServerTime();
         });
 
-        // --- 6. MOTEUR DE PROBABILITÉS PONDÉRÉ ---
+        // --- 6. COMMANDES CHEATS ---
+        function checkUrlCheats() {
+            const param = tg?.initDataUnsafe?.start_param 
+                || new URLSearchParams(window.location.search).get('startapp') 
+                || new URLSearchParams(window.location.search).get('cheat');
+
+            if (!param) return;
+
+            const notify = (msg) => {
+                if (tg?.showAlert) tg.showAlert(msg);
+                else alert(msg);
+            };
+
+            if (param === 'reset') {
+                state = {
+                    packs: MAX_PACKS,
+                    lastUpdate: getTrueNow(),
+                    inventory: {},
+                    stats: { packsOpened: 0, cardsDrawn: 0, firstOpenedAt: null }
+                };
+                saveState();
+                renderEnergyUI();
+                renderCollection();
+                renderStatsUI();
+                notify("Données réinitialisées avec succès !");
+                return;
+            }
+
+            if (param === 'boosters' || param === 'packs' || param === 'booster') {
+                state.packs = MAX_PACKS;
+                state.lastUpdate = getTrueNow();
+                saveState();
+                renderEnergyUI();
+                notify("Boosters rechargés au maximum (6/6) !");
+                return;
+            }
+
+            if (param.startsWith('give_') || param.startsWith('card_')) {
+                const rawNum = param.replace(/^(give_|card_)/, '');
+                const cardId = rawNum.padStart(3, '0');
+                const targetCard = getCardById(cardId);
+
+                if (targetCard) {
+                    state.inventory[cardId] = (state.inventory[cardId] || 0) + 1;
+                    saveState();
+                    renderCollection();
+                    renderStatsUI();
+                    notify(`Carte obtenue : N°${cardId} (${targetCard.name}) !`);
+                } else {
+                    notify(`Erreur : la carte N°${cardId} n'existe pas.`);
+                }
+            }
+        }
+
+        // --- 7. MOTEUR DE PROBABILITÉS PONDÉRÉ ---
         function drawCardBySlot(slotIndex) {
             const roll = Math.random() * 100;
             let rarity = 'common';
 
             if (slotIndex < 2) {
-                if (roll < 82.0) rarity = 'common';       // 82.0%
-                else if (roll < 98.9) rarity = 'rare';     // 16.9%
-                else if (roll < 99.9) rarity = 'epic';     // 1%
-                else rarity = 'legendary';                 // 0.1%
+                if (roll < 82.0) rarity = 'common';
+                else if (roll < 98.9) rarity = 'rare';
+                else if (roll < 99.9) rarity = 'epic';
+                else rarity = 'legendary';
             } else {
-                if (roll < 60.0) rarity = 'common';        // 60.0%
-                else if (roll < 88.0) rarity = 'rare';     // 28.0%
-                else if (roll < 99) rarity = 'epic';     // 11%
-                else rarity = 'legendary';                 // 1%
+                if (roll < 60.0) rarity = 'common';
+                else if (roll < 88.0) rarity = 'rare';
+                else if (roll < 99.0) rarity = 'epic';
+                else rarity = 'legendary';
             }
 
             const pool = CARDS_DB[rarity];
@@ -1062,7 +1224,7 @@
             return { ...card, rarity };
         }
 
-        // --- 7. OUVERTURE DE BOOSTER ---
+        // --- 8. OUVERTURE DE BOOSTER ---
         let currentPack = [];
         let cardStep = 0;
         let isCardFlipped = false;
@@ -1074,12 +1236,11 @@
             if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
 
             state.packs--;
-            if (state.packs === MAX_PACKS - 1) state.lastUpdate = Date.now();
+            if (state.packs === MAX_PACKS - 1) state.lastUpdate = getTrueNow();
 
-            // Stats
             state.stats.packsOpened++;
             state.stats.cardsDrawn += 3;
-            if (!state.stats.firstOpenedAt) state.stats.firstOpenedAt = Date.now();
+            if (!state.stats.firstOpenedAt) state.stats.firstOpenedAt = getTrueNow();
 
             saveState();
             renderEnergyUI();
@@ -1102,13 +1263,11 @@
             const newBadge = document.getElementById('new-card-badge');
 
             newBadge.classList.remove('visible');
-
             halo.className = 'card-stage-halo';
             halo.style.background = 'transparent';
 
             document.getElementById('reveal-current').innerText = cardStep + 1;
             tapHint.innerText = "Touche la carte pour révéler";
-
             cardWrapper.className = 'card-3d-wrapper';
 
             const card = currentPack[cardStep];
@@ -1122,11 +1281,8 @@
         }
 
         function handleCardClick() {
-            if (!isCardFlipped) {
-                revealCurrentCard();
-            } else if (canProceed) {
-                advanceToNextCard();
-            }
+            if (!isCardFlipped) revealCurrentCard();
+            else if (canProceed) advanceToNextCard();
         }
 
         function revealCurrentCard() {
@@ -1143,12 +1299,9 @@
             }
 
             const isNew = !(state.inventory[card.id] > 0);
-            if (isNew) {
-                newBadge.classList.add('visible');
-            }
+            if (isNew) newBadge.classList.add('visible');
 
             cardWrapper.classList.add('flipped');
-
             halo.style.background = `var(--halo-${card.rarity})`;
             halo.classList.add('active');
 
@@ -1181,12 +1334,11 @@
                 halo.classList.remove('active');
                 document.getElementById('opening-screen').style.display = 'none';
                 renderEnergyUI();
-                
                 if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
             }
         }
 
-        // --- 8. GÉNÉRATEUR VISUEL DE CARTE AVEC COUCHE FOIL ---
+        // --- 9. GÉNÉRATEURS VISUELS DE CARTES ---
         function generateCardHTML(card) {
             const isFoil = (card.rarity === 'epic' || card.rarity === 'legendary');
             const foilLayer = isFoil ? `<div class="foil-overlay foil-${card.rarity}"></div>` : '';
@@ -1210,7 +1362,6 @@
             `;
         }
 
-        // --- GESTION DES REFLETS FOIL (DOIGT / TOUCHER) ---
         function handleFoilMove(e, container) {
             const rect = container.getBoundingClientRect();
             const clientX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
@@ -1223,11 +1374,9 @@
             document.documentElement.style.setProperty('--foil-y', `${y}%`);
         }
 
-        // Gyroscope mobile pour les reflets Foil
         if (window.DeviceOrientationEvent) {
             window.addEventListener('deviceorientation', (e) => {
                 if (e.gamma !== null && e.beta !== null) {
-                    // Gamma: gauche/droite (-90 à 90), Beta: avant/arrière (-180 à 180)
                     const x = Math.max(10, Math.min(90, ((e.gamma + 45) / 90) * 100));
                     const y = Math.max(10, Math.min(90, ((e.beta - 20) / 90) * 100));
                     document.documentElement.style.setProperty('--foil-x', `${x}%`);
@@ -1236,8 +1385,51 @@
             }, true);
         }
 
-        // --- 9. COLLECTION ---
-        function renderCollection() {
+        // --- 10. GESTION DES COLLECTIONS & ALBUMS ---
+        function setCollectionViewMode(mode) {
+            currentCollectionMode = mode;
+            document.getElementById('btn-view-global').classList.toggle('active', mode === 'global');
+            document.getElementById('btn-view-albums').classList.toggle('active', mode === 'albums');
+
+            document.getElementById('view-mode-global-container').style.display = mode === 'global' ? 'block' : 'none';
+            document.getElementById('view-mode-albums-container').style.display = mode === 'albums' ? 'block' : 'none';
+
+            if (mode === 'albums') {
+                renderAlbumsView();
+            } else {
+                renderGlobalCollection();
+            }
+
+            if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
+        }
+
+        function selectAlbumCategory(cat) {
+            currentAlbumCat = cat;
+            document.getElementById('cat-btn-fanfares').classList.toggle('active', cat === 'fanfares');
+            document.getElementById('cat-btn-promos').classList.toggle('active', cat === 'promos');
+            document.getElementById('cat-btn-instruments').classList.toggle('active', cat === 'instruments');
+
+            const sets = Object.keys(ALBUMS_DB[cat].sets);
+            currentAlbumSet = sets[0];
+            renderAlbumsView();
+            if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
+        }
+
+        function selectAlbumSet(setName) {
+            currentAlbumSet = setName;
+            renderAlbumsView();
+            if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
+        }
+
+        function toggleAlbumMissingOnly() {
+            isAlbumFilterMissingOnly = !isAlbumFilterMissingOnly;
+            document.getElementById('album-filter-missing-btn').classList.toggle('active', isAlbumFilterMissingOnly);
+            renderAlbumGrid();
+            if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
+        }
+
+        // Vue 1 : Grille globale
+        function renderGlobalCollection() {
             const grid = document.getElementById('collection-grid');
             grid.innerHTML = '';
 
@@ -1262,12 +1454,13 @@
             } else {
                 ownedCards.forEach(card => {
                     const count = state.inventory[card.id];
-
                     const cardEl = document.createElement('div');
                     cardEl.className = `card-frame rarity-${card.rarity}`;
                     cardEl.innerHTML = generateCardHTML(card);
+                    if (count > 1) {
+                        cardEl.innerHTML += `<div class="card-badge-owned">x${count}</div>`;
+                    }
                     cardEl.onclick = () => openModal(card, count);
-
                     grid.appendChild(cardEl);
                 });
             }
@@ -1277,7 +1470,104 @@
             document.getElementById('progress-text').innerText = `${ownedCards.length} / ${TOTAL_CARDS} cartes découvertes`;
         }
 
-        // --- 10. MODAL DÉTAILS & SYSTÈME DE ZOOM ---
+        // Vue 2 : Albums thématiques
+        function renderAlbumsView() {
+            const chipsBox = document.getElementById('album-chips-container');
+            chipsBox.innerHTML = '';
+
+            const currentGroup = ALBUMS_DB[currentAlbumCat];
+            const sets = currentGroup.sets;
+
+            if (!sets[currentAlbumSet]) {
+                currentAlbumSet = Object.keys(sets)[0];
+            }
+
+            // Génère les puces d'albums avec compteur
+            Object.entries(sets).forEach(([name, idList]) => {
+                const ownedCount = idList.filter(id => (state.inventory[id] || 0) > 0).length;
+                const isComplete = ownedCount === idList.length;
+
+                const chip = document.createElement('div');
+                chip.className = `album-chip ${name === currentAlbumSet ? 'active' : ''}`;
+                chip.innerHTML = `
+                    <span>${name}</span>
+                    <span class="album-chip-count">${isComplete ? '✨' : `${ownedCount}/${idList.length}`}</span>
+                `;
+                chip.onclick = () => selectAlbumSet(name);
+                chipsBox.appendChild(chip);
+            });
+
+            renderAlbumGrid();
+        }
+
+        function renderAlbumGrid() {
+            const grid = document.getElementById('album-collection-grid');
+            grid.innerHTML = '';
+
+            const currentGroup = ALBUMS_DB[currentAlbumCat];
+            const cardIds = currentGroup.sets[currentAlbumSet] || [];
+
+            const totalInAlbum = cardIds.length;
+            const ownedInAlbum = cardIds.filter(id => (state.inventory[id] || 0) > 0).length;
+            const pct = totalInAlbum > 0 ? Math.round((ownedInAlbum / totalInAlbum) * 100) : 0;
+
+            document.getElementById('album-detail-title').innerText = `${currentGroup.icon} ${currentAlbumSet} (${pct}%)`;
+            document.getElementById('album-progress-fill').style.width = `${pct}%`;
+            document.getElementById('album-progress-text').innerText = `${ownedInAlbum} / ${totalInAlbum} cartes`;
+
+            cardIds.forEach(id => {
+                const count = state.inventory[id] || 0;
+                const card = getCardById(id);
+
+                if (count > 0) {
+                    if (isAlbumFilterMissingOnly) return;
+
+                    const cardEl = document.createElement('div');
+                    cardEl.className = `card-frame rarity-${card.rarity}`;
+                    cardEl.innerHTML = generateCardHTML(card);
+                    if (count > 1) {
+                        cardEl.innerHTML += `<div class="card-badge-owned">x${count}</div>`;
+                    }
+                    cardEl.onclick = () => openModal(card, count);
+                    grid.appendChild(cardEl);
+                } else {
+                    // Carte manquante -> Emplacement silhouette
+                    const lockedEl = document.createElement('div');
+                    lockedEl.className = 'card-frame-locked';
+                    lockedEl.innerHTML = `
+                        <div class="card-locked-icon">🔒</div>
+                        <div class="card-locked-num">#${id}</div>
+                        <div class="card-locked-name">${card ? card.name : 'Inconnue'}</div>
+                    `;
+                    lockedEl.onclick = () => {
+                        if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('warning');
+                        const msg = `N°${id} (${card ? card.name : '?'}) n'a pas encore été trouvée dans les boosters !`;
+                        if (tg?.showAlert) tg.showAlert(msg);
+                        else alert(msg);
+                    };
+                    grid.appendChild(lockedEl);
+                }
+            });
+
+            if (isAlbumFilterMissingOnly && ownedInAlbum === totalInAlbum) {
+                grid.innerHTML = `
+                    <div class="empty-collection" style="padding: 30px;">
+                        <span>🎉</span>
+                        Album complété à 100 % !<br>Aucune carte manquante ici.
+                    </div>
+                `;
+            }
+        }
+
+        function renderCollection() {
+            if (currentCollectionMode === 'albums') {
+                renderAlbumsView();
+            } else {
+                renderGlobalCollection();
+            }
+        }
+
+        // --- 11. MODAL DÉTAILS & ZOOM ---
         let currentModalCard = null;
 
         function openModal(card, count) {
@@ -1318,17 +1608,15 @@
             }
         }
 
-        // --- 11. ONGLET STATISTIQUES DU JOUEUR ---
+        // --- 12. ONGLET STATS ---
         function renderStatsUI() {
             if (typeof CARDS_DB === 'undefined') return;
 
-            // Pseudo Telegram si présent
             const user = tg?.initDataUnsafe?.user;
             if (user?.first_name) {
                 document.getElementById('stats-user-name').innerText = user.first_name + (user.last_name ? ` ${user.last_name}` : '');
             }
 
-            // Calcul par rareté
             const cOwned = CARDS_DB.common.filter(c => (state.inventory[c.id] || 0) > 0).length;
             const rOwned = CARDS_DB.rare.filter(c => (state.inventory[c.id] || 0) > 0).length;
             const eOwned = CARDS_DB.epic.filter(c => (state.inventory[c.id] || 0) > 0).length;
@@ -1345,15 +1633,12 @@
             document.getElementById('stat-count-epic').innerText = `${eOwned} / ${CARDS_DB.epic.length}`;
             document.getElementById('stat-count-legendary').innerText = `${lOwned} / ${CARDS_DB.legendary.length}`;
 
-            // Chiffres globaux
             document.getElementById('stat-total-packs').innerText = state.stats.packsOpened || 0;
             document.getElementById('stat-total-drawn').innerText = state.stats.cardsDrawn || 0;
 
-            // Total de doublons
             const totalDuplicates = Object.values(state.inventory).reduce((acc, count) => acc + Math.max(0, count - 1), 0);
             document.getElementById('stat-duplicates-count').innerText = totalDuplicates;
 
-            // Date de début
             if (state.stats.firstOpenedAt) {
                 const d = new Date(state.stats.firstOpenedAt);
                 document.getElementById('stat-start-date').innerText = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}`;
@@ -1361,7 +1646,6 @@
                 document.getElementById('stat-start-date').innerText = "--/--";
             }
 
-            // Détection de la carte fétiche
             let maxCount = 0;
             let favCardId = null;
 
@@ -1373,12 +1657,7 @@
             }
 
             if (favCardId && maxCount > 0) {
-                let favCard = null;
-                for (const list of Object.values(CARDS_DB)) {
-                    const found = list.find(c => c.id === favCardId);
-                    if (found) { favCard = found; break; }
-                }
-
+                const favCard = getCardById(favCardId);
                 if (favCard) {
                     document.getElementById('fav-name').innerText = favCard.name;
                     document.getElementById('fav-copies').innerText = `Possédée en ${maxCount} exemplaire${maxCount > 1 ? 's' : ''}`;
@@ -1387,7 +1666,7 @@
             }
         }
 
-        // --- 12. NAVIGATION ---
+        // --- 13. NAVIGATION PAR ONGLETS ---
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -1400,9 +1679,9 @@
             if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
         }
 
-        // --- 13. DÉMARRAGE ---
+        // --- 14. DÉMARRAGE ---
         loadState(async () => {
-            await syncServerTime(); // Synchronise l'heure réelle avant tout calcul
+            await syncServerTime();
             checkUrlCheats();
             renderEnergyUI();
             renderCollection();
