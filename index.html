@@ -157,7 +157,6 @@
         }
         .empty-collection span { font-size: 40px; display: block; margin-bottom: 12px; }
 
-        /* Carte collection : aucun border-radius pour préserver les bords d'origine */
         .card-frame {
             aspect-ratio: 630 / 880;
             position: relative;
@@ -227,7 +226,6 @@
             justify-content: center;
         }
 
-        /* Halo arrière-plan pur */
         .card-stage-halo {
             position: absolute;
             inset: -30px;
@@ -308,7 +306,7 @@
         .back-pattern svg { width: 50px; height: 50px; fill: #2481cc; opacity: 0.8; }
         .back-pattern span { font-size: 11px; font-weight: 800; letter-spacing: 2px; color: #4e7399; text-transform: uppercase; }
 
-        /* Face avant : aucun rognage ni bordure */
+        /* Face avant */
         .card-face.front {
             transform: rotateY(180deg);
             background: transparent;
@@ -367,13 +365,18 @@
         .modal-card-stage {
             width: 180px;
             aspect-ratio: 630 / 880;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             background: transparent;
             transition: filter 0.3s ease;
         }
 
-        .modal-name { font-size: 20px; font-weight: 800; margin-bottom: 4px; text-align: center; }
-        .modal-rarity { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
+        .modal-rarity { 
+            font-size: 13px; 
+            font-weight: 800; 
+            text-transform: uppercase; 
+            letter-spacing: 1.5px; 
+            margin-bottom: 14px; 
+        }
         .modal-badge-count {
             background: rgba(255,255,255,0.06);
             border: 1px solid rgba(255,255,255,0.1);
@@ -381,7 +384,7 @@
             border-radius: 30px;
             font-size: 14px;
             font-weight: 700;
-            margin-bottom: 22px;
+            margin-bottom: 20px;
         }
         .modal-close-btn {
             background: rgba(255,255,255,0.1);
@@ -482,7 +485,6 @@
     <div class="modal-overlay" id="card-modal" onclick="closeModal(event)">
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="modal-card-stage" id="modal-card-stage"></div>
-            <div class="modal-name" id="modal-card-name">Nom</div>
             <div class="modal-rarity" id="modal-card-rarity">Rareté</div>
             <div class="modal-badge-count">Exemplaires possédés : <strong id="modal-card-count" style="color: var(--button-color); margin-left: 4px;">x0</strong></div>
             <button class="modal-close-btn" onclick="closeModal()">Fermer</button>
@@ -572,7 +574,7 @@
             openBtn.innerText = state.packs > 0 ? "Ouvrir 1 Booster (3 cartes)" : "Recharge en cours...";
         }
 
-        // Fonctions dev conservées pour usage console si besoin (F12)
+        // Fonctions dev accessibles depuis la console (F12)
         window.devResetTimer = function() {
             state.packs = MAX_PACKS;
             state.lastUpdate = Date.now();
@@ -608,12 +610,12 @@
             let rarity = 'common';
 
             if (slotIndex < 2) {
-                // Emplacements 1 et 2 : principalement Communes et Rares
+                // Emplacements 1 et 2 : majoritairement Communes et Rares
                 if (roll < 80.0) {
                     rarity = 'common';       // 80.0%
-                } else if (roll < 97.5) {
+                } else if (roll < 97.0) {
                     rarity = 'rare';         // 17.0%
-                } else if (roll < 99.8) {
+                } else if (roll < 99.7) {
                     rarity = 'epic';         // 2.7%
                 } else {
                     rarity = 'legendary';    // 0.3%
@@ -622,9 +624,9 @@
                 // Emplacement 3 (Dernière carte) : boost Rares, Épiques et Légendaires
                 if (roll < 32.0) {
                     rarity = 'common';       // 32.0%
-                } else if (roll < 79.0) {
+                } else if (roll < 78.0) {
                     rarity = 'rare';         // 46.0%
-                } else if (roll < 98.0) {
+                } else if (roll < 96.0) {
                     rarity = 'epic';         // 18.0%
                 } else {
                     rarity = 'legendary';    // 4.0%
@@ -652,7 +654,6 @@
             saveState();
             renderEnergyUI();
 
-            // Tirage selon l'emplacement exact
             currentPack = [drawCardBySlot(0), drawCardBySlot(1), drawCardBySlot(2)];
             cardStep = 0;
 
@@ -805,8 +806,6 @@
             stage.className = 'modal-card-stage';
             stage.style.filter = `drop-shadow(0 0 20px var(--halo-${card.rarity}))`;
             stage.innerHTML = generateCardHTML(card);
-
-            document.getElementById('modal-card-name').innerText = card.name;
 
             const rarityEl = document.getElementById('modal-card-rarity');
             rarityEl.innerText = card.rarity;
