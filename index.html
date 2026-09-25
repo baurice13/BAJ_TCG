@@ -645,10 +645,10 @@
                 else if (roll < 99.7) rarity = 'epic';     // 2.7%
                 else rarity = 'legendary';                 // 0.3%
             } else {
-                if (roll < 32.0) rarity = 'common';        // 32.0%
-                else if (roll < 78.0) rarity = 'rare';     // 46.0%
-                else if (roll < 96.0) rarity = 'epic';     // 18.0%
-                else rarity = 'legendary';                 // 4.0%
+                if (roll < 40.0) rarity = 'common';        // 40.0%
+                else if (roll < 85.0) rarity = 'rare';     // 45.0%
+                else if (roll < 98.0) rarity = 'epic';     // 13.0%
+                else rarity = 'legendary';                 // 2.0%
             }
 
             const pool = CARDS_DB[rarity];
