@@ -640,15 +640,15 @@
             let rarity = 'common';
 
             if (slotIndex < 2) {
-                if (roll < 80.0) rarity = 'common';       // 80.0%
-                else if (roll < 97.0) rarity = 'rare';     // 17.0%
+                if (roll < 82.0) rarity = 'common';       // 82.0%
+                else if (roll < 97.0) rarity = 'rare';     // 15.0%
                 else if (roll < 99.7) rarity = 'epic';     // 2.7%
                 else rarity = 'legendary';                 // 0.3%
             } else {
-                if (roll < 40.0) rarity = 'common';        // 40.0%
-                else if (roll < 85.0) rarity = 'rare';     // 45.0%
-                else if (roll < 98.0) rarity = 'epic';     // 13.0%
-                else rarity = 'legendary';                 // 2.0%
+                if (roll < 60.0) rarity = 'common';        // 60.0%
+                else if (roll < 88.0) rarity = 'rare';     // 28.0%
+                else if (roll < 98.5) rarity = 'epic';     // 10.5%
+                else rarity = 'legendary';                 // 1.5%
             }
 
             const pool = CARDS_DB[rarity];
