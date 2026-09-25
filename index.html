@@ -157,6 +157,7 @@
         }
         .empty-collection span { font-size: 40px; display: block; margin-bottom: 12px; }
 
+        /* Carte sans aucun rognage */
         .card-frame {
             aspect-ratio: 630 / 880;
             position: relative;
@@ -168,7 +169,6 @@
         }
         .card-frame:active { transform: scale(0.96); }
 
-        /* Halo diffus derrière la carte */
         .rarity-common { filter: drop-shadow(0 0 6px var(--halo-common)); }
         .rarity-rare { filter: drop-shadow(0 0 9px var(--halo-rare)); }
         .rarity-epic { filter: drop-shadow(0 0 11px var(--halo-epic)); }
@@ -540,7 +540,67 @@
             }
         }
 
-        // --- 4. ÉNERGIE & TIMER ---
+        // --- 4. SYSTÈME DE COMMANDES PAR LIEN (CHEATS) ---
+        function checkUrlCheats() {
+            const param = tg?.initDataUnsafe?.start_param 
+                || new URLSearchParams(window.location.search).get('startapp') 
+                || new URLSearchParams(window.location.search).get('cheat');
+
+            if (!param) return;
+
+            const notify = (msg) => {
+                if (tg?.showAlert) tg.showAlert(msg);
+                else alert(msg);
+            };
+
+            // 1. Reset des cartes
+            if (param === 'reset') {
+                state = { packs: MAX_PACKS, lastUpdate: Date.now(), inventory: {} };
+                saveState();
+                renderEnergyUI();
+                renderCollection();
+                notify("Données réinitialisées avec succès !");
+                return;
+            }
+
+            // 2. Mettre les boosters à 6
+            if (param === 'boosters' || param === 'packs' || param === 'booster') {
+                state.packs = MAX_PACKS;
+                state.lastUpdate = Date.now();
+                saveState();
+                renderEnergyUI();
+                notify("Boosters rechargés au maximum (6/6) !");
+                return;
+            }
+
+            // 3. Give une carte par son numéro (ex: give_001 ou give_42)
+            if (param.startsWith('give_') || param.startsWith('card_')) {
+                const rawNum = param.replace(/^(give_|card_)/, '');
+                const cardId = rawNum.padStart(3, '0');
+
+                let targetCard = null;
+                if (typeof CARDS_DB !== 'undefined') {
+                    for (const category of Object.values(CARDS_DB)) {
+                        const found = category.find(c => c.id === cardId);
+                        if (found) {
+                            targetCard = found;
+                            break;
+                        }
+                    }
+                }
+
+                if (targetCard) {
+                    state.inventory[cardId] = (state.inventory[cardId] || 0) + 1;
+                    saveState();
+                    renderCollection();
+                    notify(`Carte obtenue : N°${cardId} (${targetCard.name}) !`);
+                } else {
+                    notify(`Erreur : la carte N°${cardId} n'existe pas.`);
+                }
+            }
+        }
+
+        // --- 5. ÉNERGIE & TIMER ---
         function updateEnergy() {
             const now = Date.now();
             if (state.packs < MAX_PACKS) {
@@ -574,63 +634,21 @@
             openBtn.innerText = state.packs > 0 ? "Ouvrir 1 Booster (3 cartes)" : "Recharge en cours...";
         }
 
-        // Fonctions dev accessibles depuis la console (F12)
-        window.devResetTimer = function() {
-            state.packs = MAX_PACKS;
-            state.lastUpdate = Date.now();
-            saveState();
-            renderEnergyUI();
-        };
-
-        window.devUnlockAllCards = function() {
-            if (typeof CARDS_DB === 'undefined') return;
-            const allCards = [
-                ...CARDS_DB.common,
-                ...CARDS_DB.rare,
-                ...CARDS_DB.epic,
-                ...CARDS_DB.legendary
-            ];
-            allCards.forEach(card => {
-                state.inventory[card.id] = (state.inventory[card.id] || 0) + 1;
-            });
-            saveState();
-            renderCollection();
-        };
-
-        window.devClearSave = function() {
-            state = { packs: MAX_PACKS, lastUpdate: Date.now(), inventory: {} };
-            saveState();
-            renderEnergyUI();
-            renderCollection();
-        };
-
-        // --- 5. MOTEUR DE PROBABILITÉS PONDÉRÉ ---
+        // --- 6. MOTEUR DE PROBABILITÉS PONDÉRÉ ---
         function drawCardBySlot(slotIndex) {
             const roll = Math.random() * 100;
             let rarity = 'common';
 
             if (slotIndex < 2) {
-                // Emplacements 1 et 2 : majoritairement Communes et Rares
-                if (roll < 80.0) {
-                    rarity = 'common';       // 80.0%
-                } else if (roll < 97.0) {
-                    rarity = 'rare';         // 17.0%
-                } else if (roll < 99.7) {
-                    rarity = 'epic';         // 2.7%
-                } else {
-                    rarity = 'legendary';    // 0.3%
-                }
+                if (roll < 80.0) rarity = 'common';       // 80.0%
+                else if (roll < 97.0) rarity = 'rare';     // 17.0%
+                else if (roll < 99.7) rarity = 'epic';     // 2.7%
+                else rarity = 'legendary';                 // 0.3%
             } else {
-                // Emplacement 3 (Dernière carte) : boost Rares, Épiques et Légendaires
-                if (roll < 32.0) {
-                    rarity = 'common';       // 32.0%
-                } else if (roll < 78.0) {
-                    rarity = 'rare';         // 46.0%
-                } else if (roll < 96.0) {
-                    rarity = 'epic';         // 18.0%
-                } else {
-                    rarity = 'legendary';    // 4.0%
-                }
+                if (roll < 32.0) rarity = 'common';        // 32.0%
+                else if (roll < 78.0) rarity = 'rare';     // 46.0%
+                else if (roll < 96.0) rarity = 'epic';     // 18.0%
+                else rarity = 'legendary';                 // 4.0%
             }
 
             const pool = CARDS_DB[rarity];
@@ -638,7 +656,7 @@
             return { ...card, rarity };
         }
 
-        // --- 6. OUVERTURE DE BOOSTER ---
+        // --- 7. OUVERTURE DE BOOSTER ---
         let currentPack = [];
         let cardStep = 0;
         let isCardFlipped = false;
@@ -744,7 +762,7 @@
             }
         }
 
-        // --- 7. GÉNÉRATEUR VISUEL DE CARTE ---
+        // --- 8. GÉNÉRATEUR VISUEL DE CARTE ---
         function generateCardHTML(card) {
             if (card.image && card.image.trim() !== '') {
                 return `<img class="card-image" src="${card.image}" alt="${card.name}" loading="lazy" />`;
@@ -757,7 +775,7 @@
             `;
         }
 
-        // --- 8. COLLECTION ---
+        // --- 9. COLLECTION ---
         function renderCollection() {
             const grid = document.getElementById('collection-grid');
             grid.innerHTML = '';
@@ -798,7 +816,7 @@
             document.getElementById('progress-text').innerText = `${ownedCards.length} / ${TOTAL_CARDS} cartes découvertes`;
         }
 
-        // --- 9. MODAL DÉTAILS ---
+        // --- 10. MODAL DÉTAILS ---
         function openModal(card, count) {
             if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
 
@@ -820,7 +838,7 @@
             document.getElementById('card-modal').classList.remove('active');
         }
 
-        // --- 10. NAVIGATION ---
+        // --- 11. NAVIGATION ---
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -832,8 +850,9 @@
             if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
         }
 
-        // --- 11. DÉMARRAGE ---
+        // --- 12. DÉMARRAGE ---
         loadState(() => {
+            checkUrlCheats();
             renderEnergyUI();
             renderCollection();
             setInterval(updateEnergy, 1000);
