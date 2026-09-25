@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Telegram Gacha TCG</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="cards_data.js"></script>
     <style>
         /* --- VARIABLES & THÈME TELEGRAM --- */
         :root {
@@ -116,7 +117,7 @@
         .pack-btn:active { transform: scale(0.98); }
         .pack-btn:disabled { background: #333e4d; color: #6d7b8b; cursor: not-allowed; box-shadow: none; }
 
-        /* --- OUTILS DEV (TEST DU TIMER) --- */
+        /* --- OUTILS DEV --- */
         .dev-panel {
             margin-top: 35px;
             padding: 15px;
@@ -162,7 +163,6 @@
             font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
         }
 
-        /* Ratio 630 x 880 (TCG standard) */
         .collection-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -245,7 +245,6 @@
             letter-spacing: 1.5px;
         }
 
-        /* Conteneur de scène 3D */
         .card-stage-container {
             position: relative;
             width: min(280px, 75vw);
@@ -255,7 +254,6 @@
             justify-content: center;
         }
 
-        /* Halo lumineux de rareté */
         .card-stage-halo {
             position: absolute;
             inset: -15px;
@@ -285,7 +283,6 @@
             transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
-        /* Animations d'entrée / sortie sans spoil */
         .slide-in-right {
             animation: slideInRight 0.35s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
         }
@@ -316,7 +313,6 @@
             border: 3.5px solid rgba(255,255,255,0.12);
         }
 
-        /* Dos de la carte TCG */
         .card-face.back {
             background: linear-gradient(135deg, #18283b, #0e1722);
             display: flex;
@@ -339,7 +335,6 @@
         .back-pattern svg { width: 50px; height: 50px; fill: #2481cc; opacity: 0.8; }
         .back-pattern span { font-size: 11px; font-weight: 800; letter-spacing: 2px; color: #4e7399; text-transform: uppercase; }
 
-        /* Face avant révélée avec GLOWS DE RARETÉ */
         .card-face.front {
             transform: rotateY(180deg);
             background: var(--secondary-bg);
@@ -470,12 +465,13 @@
             Ouvrir 1 Booster (3 cartes)
         </button>
 
-        <!-- OUTILS DEV (TEST DU TIMER) -->
+        <!-- OUTILS DEV -->
         <div class="dev-panel">
             <div class="dev-title">🛠️ Outils Dev (Test Rapide)</div>
             <div class="dev-btn-group">
                 <button class="dev-btn" onclick="devResetTimer()">⚡ Booster Max (5/5)</button>
                 <button class="dev-btn" onclick="devAddPack()">➕ +1 Booster</button>
+                <button class="dev-btn" onclick="devUnlockAllCards()">🃏 Toutes les cartes</button>
                 <button class="dev-btn" onclick="devClearSave()" style="color: #ff6b6b;">🗑️ Reset Data</button>
             </div>
         </div>
@@ -562,33 +558,10 @@
             tg.expand();
         }
 
-        // --- 2. BASE DE DONNÉES (Supporte 630x880) ---
-        const CARDS_DB = {
-            common: [
-                { id: 'c1', name: 'Épée de novice', emoji: '🗡️', image: '' },
-                { id: 'c2', name: 'Bouclier en bois', emoji: '🛡️', image: '' },
-                { id: 'c3', name: 'Pomme enchantée', emoji: '🍎', image: '' },
-                { id: 'c4', name: 'Bottes de cuir', emoji: '👢', image: '' },
-                { id: 'c5', name: 'Parchemin vierge', emoji: '📜', image: '' }
-            ],
-            rare: [
-                { id: 'r1', name: 'Bague de Mana', emoji: '💍', image: '' },
-                { id: 'r2', name: 'Grimoire secret', emoji: '📖', image: '' },
-                { id: 'r3', name: 'Élixir astral', emoji: '🧪', image: '' },
-                { id: 'r4', name: 'Arc elfique', emoji: '🏹', image: '' }
-            ],
-            epic: [
-                { id: 'e1', name: 'Couronne royale', emoji: '👑', image: '' },
-                { id: 'e2', name: 'Lame des ombres', emoji: '🗡️✨', image: '' },
-                { id: 'e3', name: 'Guerrier Golem', emoji: '🗿', image: '' }
-            ],
-            legendary: [
-                { id: 'l1', name: 'Dragon Primordial', emoji: '🐉', image: '' },
-                { id: 'l2', name: 'Cristal Cosmique', emoji: '💎', image: '' }
-            ]
-        };
-
-        const TOTAL_CARDS = Object.values(CARDS_DB).reduce((sum, list) => sum + list.length, 0);
+        // --- 2. CALCUL DYNAMIQUE VIA CARDS_DATA.JS ---
+        const TOTAL_CARDS = typeof CARDS_DB !== 'undefined' 
+            ? Object.values(CARDS_DB).reduce((sum, list) => sum + list.length, 0) 
+            : 0;
 
         // --- 3. SAUVEGARDE VIA CLOUDSTORAGE ---
         const PACK_REGEN_TIME = 30 * 60 * 1000; // 30 minutes
@@ -676,6 +649,22 @@
             if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
         }
 
+        function devUnlockAllCards() {
+            if (typeof CARDS_DB === 'undefined') return;
+            const allCards = [
+                ...CARDS_DB.common,
+                ...CARDS_DB.rare,
+                ...CARDS_DB.epic,
+                ...CARDS_DB.legendary
+            ];
+            allCards.forEach(card => {
+                state.inventory[card.id] = (state.inventory[card.id] || 0) + 1;
+            });
+            saveState();
+            renderCollection();
+            if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+        }
+
         function devClearSave() {
             if (confirm("Réinitialiser l'inventaire et les boosters ?")) {
                 state = { packs: MAX_PACKS, lastUpdate: Date.now(), inventory: {} };
@@ -751,10 +740,8 @@
 
         function handleCardClick() {
             if (!isCardFlipped) {
-                // 1er Clic : Révélation de la carte
                 revealCurrentCard();
             } else if (canProceed) {
-                // 2ème Clic : Carte suivante ou fermeture
                 advanceToNextCard();
             }
         }
@@ -776,13 +763,11 @@
             halo.style.background = `var(--color-${card.rarity})`;
             halo.classList.add('active');
 
-            // Sauvegarde dans l'inventaire
             state.inventory[card.id] = (state.inventory[card.id] || 0) + 1;
             saveState();
 
             setTimeout(() => {
                 canProceed = true;
-                // Indique "terminer" sur la 3ème carte
                 tapHint.innerText = cardStep === 2 ? "Touche pour terminer" : "Touche la carte pour continuer";
             }, 450);
         }
@@ -794,8 +779,6 @@
             if (cardStep < 2) {
                 const cardWrapper = document.getElementById('card-3d');
                 halo.classList.remove('active');
-
-                // Sortie vers la gauche sans spoil
                 cardWrapper.classList.add('slide-out-left');
 
                 setTimeout(() => {
@@ -803,19 +786,18 @@
                     loadCardIntoStage(true);
                 }, 280);
             } else {
-                // Fin du booster : ON RESTE SUR LA BOUTIQUE
                 halo.classList.remove('active');
                 document.getElementById('opening-screen').style.display = 'none';
-                renderEnergyUI(); // Rafraîchit l'affichage boutique
+                renderEnergyUI();
                 
                 if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
             }
         }
 
-        // --- 7. GÉNÉRATEUR VISUEL DE CARTE ---
+        // --- 7. GÉNÉRATEUR VISUEL DE CARTE AVEC LAZY LOADING ---
         function generateCardHTML(card) {
             if (card.image && card.image.trim() !== '') {
-                return `<img class="card-image" src="${card.image}" alt="${card.name}" />`;
+                return `<img class="card-image" src="${card.image}" alt="${card.name}" loading="lazy" />`;
             }
             return `
                 <div class="card-fallback">
@@ -829,6 +811,8 @@
         function renderCollection() {
             const grid = document.getElementById('collection-grid');
             grid.innerHTML = '';
+
+            if (typeof CARDS_DB === 'undefined') return;
 
             const allCards = [
                 ...CARDS_DB.common.map(c => ({ ...c, rarity: 'common' })),
@@ -859,7 +843,7 @@
                 });
             }
 
-            const pct = (ownedCards.length / TOTAL_CARDS) * 100;
+            const pct = TOTAL_CARDS > 0 ? (ownedCards.length / TOTAL_CARDS) * 100 : 0;
             document.getElementById('progress-fill').style.width = pct + '%';
             document.getElementById('progress-text').innerText = `${ownedCards.length} / ${TOTAL_CARDS} cartes découvertes`;
         }
