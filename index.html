@@ -157,7 +157,6 @@
         }
         .empty-collection span { font-size: 40px; display: block; margin-bottom: 12px; }
 
-        /* Carte sans aucun rognage */
         .card-frame {
             aspect-ratio: 630 / 880;
             position: relative;
@@ -209,12 +208,38 @@
 
         .reveal-header {
             position: absolute;
-            top: 40px;
-            font-size: 16px;
+            top: 36px;
+            font-size: 15px;
             font-weight: 800;
             color: var(--hint-color);
             text-transform: uppercase;
             letter-spacing: 1.5px;
+        }
+
+        /* Pastille « Nouvelle » discrète située au-dessus de la carte */
+        .new-card-badge {
+            margin-bottom: 12px;
+            padding: 3px 10px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            border-radius: 12px;
+            background: rgba(36, 129, 204, 0.16);
+            color: #5bb2ff;
+            border: 1px solid rgba(36, 129, 204, 0.35);
+            opacity: 0;
+            transform: translateY(4px);
+            transition: opacity 0.35s ease, transform 0.35s ease;
+            pointer-events: none;
+            min-height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .new-card-badge.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         .card-stage-container {
@@ -456,6 +481,9 @@
     <div id="opening-screen">
         <div class="reveal-header">Carte <span id="reveal-current">1</span> / 3</div>
 
+        <!-- Pastille discrète hors de la carte -->
+        <div class="new-card-badge" id="new-card-badge">✨ Nouvelle</div>
+
         <div class="card-stage-container">
             <div class="card-stage-halo" id="card-halo"></div>
 
@@ -540,7 +568,7 @@
             }
         }
 
-        // --- 4. SYSTÈME DE COMMANDES PAR LIEN (CHEATS) ---
+        // --- 4. COMMANDES PAR LIEN (CHEATS) ---
         function checkUrlCheats() {
             const param = tg?.initDataUnsafe?.start_param 
                 || new URLSearchParams(window.location.search).get('startapp') 
@@ -553,7 +581,6 @@
                 else alert(msg);
             };
 
-            // 1. Reset des cartes
             if (param === 'reset') {
                 state = { packs: MAX_PACKS, lastUpdate: Date.now(), inventory: {} };
                 saveState();
@@ -563,7 +590,6 @@
                 return;
             }
 
-            // 2. Mettre les boosters à 6
             if (param === 'boosters' || param === 'packs' || param === 'booster') {
                 state.packs = MAX_PACKS;
                 state.lastUpdate = Date.now();
@@ -573,7 +599,6 @@
                 return;
             }
 
-            // 3. Give une carte par son numéro (ex: give_001 ou give_42)
             if (param.startsWith('give_') || param.startsWith('card_')) {
                 const rawNum = param.replace(/^(give_|card_)/, '');
                 const cardId = rawNum.padStart(3, '0');
@@ -687,6 +712,10 @@
             const frontFace = document.getElementById('reveal-card-front');
             const tapHint = document.getElementById('tap-hint');
             const halo = document.getElementById('card-halo');
+            const newBadge = document.getElementById('new-card-badge');
+
+            // Réinitialise la pastille de nouveauté
+            newBadge.classList.remove('visible');
 
             halo.className = 'card-stage-halo';
             halo.style.background = 'transparent';
@@ -719,11 +748,18 @@
             const cardWrapper = document.getElementById('card-3d');
             const tapHint = document.getElementById('tap-hint');
             const halo = document.getElementById('card-halo');
+            const newBadge = document.getElementById('new-card-badge');
             const card = currentPack[cardStep];
 
             if (tg?.HapticFeedback) {
                 if (card.rarity === 'legendary') tg.HapticFeedback.notificationOccurred('success');
                 else tg.HapticFeedback.impactOccurred('heavy');
+            }
+
+            // Vérifie si la carte est nouvelle dans la collection
+            const isNew = !(state.inventory[card.id] > 0);
+            if (isNew) {
+                newBadge.classList.add('visible');
             }
 
             cardWrapper.classList.add('flipped');
@@ -743,6 +779,9 @@
         function advanceToNextCard() {
             canProceed = false;
             const halo = document.getElementById('card-halo');
+            const newBadge = document.getElementById('new-card-badge');
+
+            newBadge.classList.remove('visible');
 
             if (cardStep < 2) {
                 const cardWrapper = document.getElementById('card-3d');
