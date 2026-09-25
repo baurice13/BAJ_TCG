@@ -959,9 +959,47 @@
             }
         }
 
-        // --- 5. ÉNERGIE & TIMER ---
+        // --- 5. GESTION DU TEMPS ANTI-TRICHE & ÉNERGIE ---
+        let serverTimeOffset = 0;
+        let isTimeSynced = false;
+
+        // Récupère l'heure réelle via l'en-tête HTTP du serveur GitHub Pages
+        async function syncServerTime() {
+            try {
+                const res = await fetch(window.location.href, { 
+                    method: 'HEAD', 
+                    cache: 'no-store' 
+                });
+                const serverHeader = res.headers.get('date');
+                if (serverHeader) {
+                    const trueServerTime = new Date(serverHeader).getTime();
+                    // Calcule le repère temporel infalsifiable
+                    serverTimeOffset = trueServerTime - performance.now();
+                    isTimeSynced = true;
+                    updateEnergy();
+                }
+            } catch (e) {
+                console.warn("Impossible de synchroniser l'heure serveur, fallback local.");
+                if (!isTimeSynced) {
+                    serverTimeOffset = Date.now() - performance.now();
+                }
+            }
+        }
+
+        // Retourne l'heure réelle actuelle sans subir les changements d'heure du téléphone
+        function getTrueNow() {
+            return Math.floor(serverTimeOffset + performance.now());
+        }
+
         function updateEnergy() {
-            const now = Date.now();
+            const now = getTrueNow();
+
+            // Sécurité anti-retour en arrière dans le temps
+            if (now < state.lastUpdate) {
+                state.lastUpdate = now;
+                saveState();
+            }
+
             if (state.packs < MAX_PACKS) {
                 const elapsed = now - state.lastUpdate;
                 const earned = Math.floor(elapsed / PACK_REGEN_TIME);
@@ -983,15 +1021,24 @@
             if (state.packs >= MAX_PACKS) {
                 document.getElementById('timer-display').innerText = "Booster max atteint (6/6)";
             } else {
-                const remaining = PACK_REGEN_TIME - (Date.now() - state.lastUpdate);
-                const m = Math.floor(remaining / 60000);
-                const s = Math.floor((remaining % 60000) / 1000);
+                const now = getTrueNow();
+                const remaining = PACK_REGEN_TIME - (now - state.lastUpdate);
+                const safeRemaining = Math.max(0, remaining);
+                const m = Math.floor(safeRemaining / 60000);
+                const s = Math.floor((safeRemaining % 60000) / 1000);
                 document.getElementById('timer-display').innerText = `Prochain booster dans ${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
             }
 
             openBtn.disabled = state.packs <= 0;
             openBtn.innerText = state.packs > 0 ? "Ouvrir 1 Booster (3 cartes)" : "Recharge en cours...";
         }
+
+        // Re-synchronisation si le joueur minimise puis ré-ouvre Telegram
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                syncServerTime();
+            }
+        });
 
         // --- 6. MOTEUR DE PROBABILITÉS PONDÉRÉ ---
         function drawCardBySlot(slotIndex) {
@@ -1354,7 +1401,8 @@
         }
 
         // --- 13. DÉMARRAGE ---
-        loadState(() => {
+        loadState(async () => {
+            await syncServerTime(); // Synchronise l'heure réelle avant tout calcul
             checkUrlCheats();
             renderEnergyUI();
             renderCollection();
