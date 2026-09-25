@@ -22,11 +22,11 @@
             --color-epic: #a335ee;
             --color-legendary: #ffaa00;
 
-            /* Halos d'ambiance projetés derrière la carte */
+            /* Halos lumineux projetés derrière la carte */
             --halo-common: rgba(149, 165, 181, 0.45);
             --halo-rare: rgba(0, 148, 255, 0.7);
             --halo-epic: rgba(163, 53, 238, 0.8);
-            --halo-legendary: rgba(255, 170, 0, 0.9);
+            --halo-legendary: rgba(255, 170, 0, 0.95);
         }
 
         * {
@@ -117,29 +117,6 @@
         .pack-btn:active { transform: scale(0.98); }
         .pack-btn:disabled { background: #333e4d; color: #6d7b8b; cursor: not-allowed; box-shadow: none; }
 
-        /* --- OUTILS DEV --- */
-        .dev-panel {
-            margin-top: 35px;
-            padding: 15px;
-            border-radius: 12px;
-            background: rgba(255,255,255,0.03);
-            border: 1px dashed rgba(255,255,255,0.15);
-            text-align: center;
-        }
-        .dev-title { font-size: 11px; text-transform: uppercase; color: var(--hint-color); letter-spacing: 1px; margin-bottom: 10px; font-weight: 700; }
-        .dev-btn-group { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
-        .dev-btn {
-            background: var(--secondary-bg);
-            color: var(--text-color);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 8px;
-            padding: 8px 12px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        .dev-btn:active { background: rgba(255,255,255,0.1); }
-
         /* --- MA COLLECTION --- */
         .progress-bar-container {
             background: var(--secondary-bg);
@@ -180,30 +157,28 @@
         }
         .empty-collection span { font-size: 40px; display: block; margin-bottom: 12px; }
 
-        /* Carte dans la collection : pas de bordure interne pour préserver les bords */
+        /* Carte collection : aucun border-radius pour préserver les bords d'origine */
         .card-frame {
             aspect-ratio: 630 / 880;
-            border-radius: 10px;
             position: relative;
-            background: var(--secondary-bg);
-            overflow: hidden;
+            background: transparent;
             display: flex;
             flex-direction: column;
             cursor: pointer;
-            transition: transform 0.15s ease, box-shadow 0.2s ease;
+            transition: transform 0.15s ease, filter 0.2s ease;
         }
         .card-frame:active { transform: scale(0.96); }
 
-        /* Raretés en collection (halo externe sans border couvrante) */
-        .rarity-common { box-shadow: 0 0 10px var(--halo-common); }
-        .rarity-rare { box-shadow: 0 0 14px var(--halo-rare); }
-        .rarity-epic { box-shadow: 0 0 16px var(--halo-epic); }
-        .rarity-legendary { box-shadow: 0 0 20px var(--halo-legendary); }
+        /* Halo diffus derrière la carte */
+        .rarity-common { filter: drop-shadow(0 0 6px var(--halo-common)); }
+        .rarity-rare { filter: drop-shadow(0 0 9px var(--halo-rare)); }
+        .rarity-epic { filter: drop-shadow(0 0 11px var(--halo-epic)); }
+        .rarity-legendary { filter: drop-shadow(0 0 14px var(--halo-legendary)); }
 
         .card-image {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain;
             display: block;
         }
         .card-fallback {
@@ -213,7 +188,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: radial-gradient(circle at center, rgba(255,255,255,0.08) 0%, transparent 80%);
+            background: var(--secondary-bg);
             padding: 8px;
             text-align: center;
         }
@@ -252,12 +227,12 @@
             justify-content: center;
         }
 
-        /* Halo arrière-plan diffus (ne recouvre aucun pixel de la carte) */
+        /* Halo arrière-plan pur */
         .card-stage-halo {
             position: absolute;
-            inset: -25px;
-            border-radius: 35px;
-            filter: blur(40px);
+            inset: -30px;
+            border-radius: 40px;
+            filter: blur(45px);
             opacity: 0;
             transition: opacity 0.4s ease, background 0.3s ease;
             pointer-events: none;
@@ -305,10 +280,8 @@
         .card-face {
             position: absolute;
             inset: 0;
-            border-radius: 14px;
             backface-visibility: hidden;
             -webkit-backface-visibility: hidden;
-            overflow: hidden;
         }
 
         /* Dos de la carte */
@@ -318,13 +291,14 @@
             align-items: center;
             justify-content: center;
             border: 2px solid #2d4563;
+            border-radius: 8px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.6);
         }
         .back-pattern {
             width: 84%;
             height: 89%;
             border: 2px dashed rgba(255,255,255,0.15);
-            border-radius: 10px;
+            border-radius: 6px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -334,14 +308,12 @@
         .back-pattern svg { width: 50px; height: 50px; fill: #2481cc; opacity: 0.8; }
         .back-pattern span { font-size: 11px; font-weight: 800; letter-spacing: 2px; color: #4e7399; text-transform: uppercase; }
 
-        /* Face avant : bordure supprimée pour préserver 100% des bords de l'image */
+        /* Face avant : aucun rognage ni bordure */
         .card-face.front {
             transform: rotateY(180deg);
-            background: var(--secondary-bg);
+            background: transparent;
             display: flex;
             flex-direction: column;
-            border: none;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
 
         .tap-hint {
@@ -395,12 +367,9 @@
         .modal-card-stage {
             width: 180px;
             aspect-ratio: 630 / 880;
-            border-radius: 10px;
-            overflow: hidden;
             margin-bottom: 20px;
-            border: none;
-            background: var(--bg-color);
-            transition: box-shadow 0.3s ease;
+            background: transparent;
+            transition: filter 0.3s ease;
         }
 
         .modal-name { font-size: 20px; font-weight: 800; margin-bottom: 4px; text-align: center; }
@@ -445,17 +414,6 @@
         <button class="pack-btn" id="open-pack-btn" onclick="startPackOpening()">
             Ouvrir 1 Booster (3 cartes)
         </button>
-
-        <!-- OUTILS DEV -->
-        <div class="dev-panel">
-            <div class="dev-title">🛠️ Outils Dev (Test Rapide)</div>
-            <div class="dev-btn-group">
-                <button class="dev-btn" onclick="devResetTimer()">⚡ Booster Max (6/6)</button>
-                <button class="dev-btn" onclick="devAddPack()">➕ +1 Booster</button>
-                <button class="dev-btn" onclick="devUnlockAllCards()">🃏 Toutes les cartes</button>
-                <button class="dev-btn" onclick="devClearSave()" style="color: #ff6b6b;">🗑️ Reset Data</button>
-            </div>
-        </div>
     </div>
 
     <!-- ONGLET 2 : MA COLLECTION -->
@@ -545,8 +503,7 @@
             : 0;
 
         // --- 3. SAUVEGARDE VIA CLOUDSTORAGE ---
-        // 1 Booster toutes les 10 minutes, 6 boosters au maximum
-        const PACK_REGEN_TIME = 10 * 60 * 1000;
+        const PACK_REGEN_TIME = 10 * 60 * 1000; // 10 minutes
         const MAX_PACKS = 6;
 
         let state = {
@@ -615,23 +572,15 @@
             openBtn.innerText = state.packs > 0 ? "Ouvrir 1 Booster (3 cartes)" : "Recharge en cours...";
         }
 
-        // --- OUTILS DEV ---
-        function devResetTimer() {
+        // Fonctions dev conservées pour usage console si besoin (F12)
+        window.devResetTimer = function() {
             state.packs = MAX_PACKS;
             state.lastUpdate = Date.now();
             saveState();
             renderEnergyUI();
-            if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-        }
+        };
 
-        function devAddPack() {
-            state.packs = Math.min(MAX_PACKS, state.packs + 1);
-            saveState();
-            renderEnergyUI();
-            if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
-        }
-
-        function devUnlockAllCards() {
+        window.devUnlockAllCards = function() {
             if (typeof CARDS_DB === 'undefined') return;
             const allCards = [
                 ...CARDS_DB.common,
@@ -644,25 +593,43 @@
             });
             saveState();
             renderCollection();
-            if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-        }
+        };
 
-        function devClearSave() {
-            if (confirm("Réinitialiser l'inventaire et les boosters ?")) {
-                state = { packs: MAX_PACKS, lastUpdate: Date.now(), inventory: {} };
-                saveState();
-                renderEnergyUI();
-                renderCollection();
-            }
-        }
+        window.devClearSave = function() {
+            state = { packs: MAX_PACKS, lastUpdate: Date.now(), inventory: {} };
+            saveState();
+            renderEnergyUI();
+            renderCollection();
+        };
 
-        // --- 5. TIRAGE ALÉATOIRE ---
-        function drawOneCard() {
+        // --- 5. MOTEUR DE PROBABILITÉS PONDÉRÉ ---
+        function drawCardBySlot(slotIndex) {
             const roll = Math.random() * 100;
             let rarity = 'common';
-            if (roll > 70 && roll <= 90) rarity = 'rare';       // 20%
-            else if (roll > 90 && roll <= 99) rarity = 'epic';   // 9%
-            else if (roll > 99) rarity = 'legendary';            // 1%
+
+            if (slotIndex < 2) {
+                // Emplacements 1 et 2 : principalement Communes et Rares
+                if (roll < 80.0) {
+                    rarity = 'common';       // 80.0%
+                } else if (roll < 97.5) {
+                    rarity = 'rare';         // 17.0%
+                } else if (roll < 99.8) {
+                    rarity = 'epic';         // 2.7%
+                } else {
+                    rarity = 'legendary';    // 0.3%
+                }
+            } else {
+                // Emplacement 3 (Dernière carte) : boost Rares, Épiques et Légendaires
+                if (roll < 32.0) {
+                    rarity = 'common';       // 32.0%
+                } else if (roll < 79.0) {
+                    rarity = 'rare';         // 46.0%
+                } else if (roll < 98.0) {
+                    rarity = 'epic';         // 18.0%
+                } else {
+                    rarity = 'legendary';    // 4.0%
+                }
+            }
 
             const pool = CARDS_DB[rarity];
             const card = pool[Math.floor(Math.random() * pool.length)];
@@ -685,7 +652,8 @@
             saveState();
             renderEnergyUI();
 
-            currentPack = [drawOneCard(), drawOneCard(), drawOneCard()];
+            // Tirage selon l'emplacement exact
+            currentPack = [drawCardBySlot(0), drawCardBySlot(1), drawCardBySlot(2)];
             cardStep = 0;
 
             document.getElementById('opening-screen').style.display = 'flex';
@@ -741,7 +709,6 @@
 
             cardWrapper.classList.add('flipped');
 
-            // Halo arrière-plan diffus sans empiéter sur l'illustration
             halo.style.background = `var(--halo-${card.rarity})`;
             halo.classList.add('active');
 
@@ -836,7 +803,7 @@
 
             const stage = document.getElementById('modal-card-stage');
             stage.className = 'modal-card-stage';
-            stage.style.boxShadow = `0 0 35px var(--halo-${card.rarity})`;
+            stage.style.filter = `drop-shadow(0 0 20px var(--halo-${card.rarity}))`;
             stage.innerHTML = generateCardHTML(card);
 
             document.getElementById('modal-card-name').innerText = card.name;
